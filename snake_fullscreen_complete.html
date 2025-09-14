@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Néon - Version Simplifiée</title>
+    
+    <meta name="description" content="Snake Néon - Jeu de serpent moderne avec skins">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Snake Néon">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff88;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 136, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            z-index: -1;
+            will-change: filter;
+            animation: bgShift 10s ease-in-out infinite alternate;
+        }
+        
+        @keyframes bgShift {
+            from { filter: hue-rotate(0deg); }
+            to { filter: hue-rotate(30deg); }
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ff88;
+            border-radius: 50%;
+            pointer-events: none;
+            will-change: transform, opacity;
+            animation: particleFloat 1s ease-out forwards;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translateY(-50px);
+            }
+        }
+        
+        .tab-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #00ff88;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            margin: 0 2px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .tab-btn.active {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        .tab-content {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 15px;
+            display: none;
+            overflow-y: auto;
+            background: #0a0a0a;
+            z-index: 100;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        #gameTab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .game-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #00ff88;
+            text-shadow: 0 0 20px #00ff88;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00ff88; }
+            to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }
+        }
+        
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #00ff88;
+            text-align: center;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item.highlight {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+            animation: statPulse 0.5s ease;
+        }
+        
+        @keyframes statPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        #gameCanvas {
+            border: 3px solid #ff0088;
+            border-radius: 15px;
+            background: #111;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            margin-bottom: 15px;
+            box-shadow: 0 0 30px rgba(255, 0, 136, 0.3);
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        .game-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .empty { background: none !important; }
+        
+        .game-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-size: 12px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            color: #000;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, #ff0088, #8800ff);
+            color: white;
+        }
+        
+        #skinsTab {
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #00ff88;
+            text-shadow: 0 0 15px #00ff88;
+        }
+        
+        .skins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .skin-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+        
+        .skin-card.active {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .skin-card.locked {
+            opacity: 0.5;
+            border-color: #666;
+            cursor: not-allowed;
+        }
+
+        .skin-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 16px;
+        }
+        
+        .skin-card:not(.locked):hover {
+            transform: translateY(-2px);
+        }
+        
+        .skin-preview {
+            width: 80px;
+            height: 50px;
+            margin: 0 auto 10px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .skin-classic { background: linear-gradient(135deg, #00ff88, #00cc66); }
+        .skin-fire { background: linear-gradient(135deg, #ff4444, #ff8800); }
+        .skin-ice { background: linear-gradient(135deg, #4488ff, #88ccff); }
+        .skin-gold { background: linear-gradient(135deg, #ffdd00, #ffaa00); }
+        .skin-purple { background: linear-gradient(135deg, #8844ff, #cc44ff); }
+        .skin-rainbow { background: linear-gradient(135deg, #ff0088, #00ff88, #0088ff, #ff4400); }
+        
+        .skin-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .skin-description {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .skin-unlock-req {
+            font-size: 9px;
+            margin-top: 5px;
+        }
+        
+        #settingsTab {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .setting-group {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-group h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .setting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        
+        .setting-option:not(:last-child) {
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .difficulty-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 12px 15px;
+            border: 2px solid #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn.active {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: #00ff88;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(25px);
+            background: #000;
+        }
+        
+        #scoresTab {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .achievement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .achievement-item.unlocked {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .achievement-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .achievement-info {
+            flex: 1;
+        }
+        
+        .achievement-name {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .achievement-desc {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        .achievement-status {
+            font-size: 18px;
+        }
+        
+        .status-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #ff0088;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            max-width: 90%;
+        }
+        
+        .status-message h2 {
+            color: #ff0088;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .status-message.paused h2 {
+            color: #ffaa00;
+        }
+        
+        .status-message.locked h2 {
+            color: #ff6688;
+        }
+        
+        .achievement-notification {
+            position: fixed;
+            top: 100px;
+            right: -300px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            z-index: 1500;
+            transition: right 0.5s ease;
+            max-width: 250px;
+            font-size: 12px;
+        }
+        
+        .achievement-notification.show {
+            right: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .tab-btn {
+                font-size: 9px;
+                padding: 8px 4px;
+            }
+            
+            .game-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+            
+            .stat-item {
+                font-size: 10px;
+                padding: 6px;
+            }
+            
+            .game-header h1 {
+                font-size: 1.5em;
+            }
+            
+            .control-btn {
+                padding: 15px;
+                font-size: 18px;
+            }
+            
+            .skins-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .skin-preview {
+                width: 60px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="showTab('game')">🎮 JEU</button>
+        <button class="tab-btn" onclick="showTab('skins')">🎨 SKINS</button>
+        <button class="tab-btn" onclick="showTab('settings')">⚙️ PARAM</button>
+        <button class="tab-btn" onclick="showTab('scores')">🏆 SCORES</button>
+    </div>
+    
+    <div id="gameTab" class="tab-content active">
+        <div class="game-header">
+            <h1>🐍 SNAKE NÉON</h1>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div>Score</div>
+                    <div id="score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>Niveau</div>
+                    <div id="level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div>Record</div>
+                    <div id="highScore">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="320" height="320"></canvas>
+        
+        <div class="game-controls">
+            <div class="empty"></div>
+            <button class="control-btn" id="upBtn">↑</button>
+            <div class="empty"></div>
+            <button class="control-btn" id="leftBtn">←</button>
+            <button class="control-btn" id="downBtn">↓</button>
+            <button class="control-btn" id="rightBtn">→</button>
+        </div>
+        
+        <div class="game-actions">
+            <button class="action-btn play-btn" id="playBtn">▶️ JOUER</button>
+            <button class="action-btn pause-btn" id="pauseBtn">⏸️ PAUSE</button>
+            <button class="action-btn restart-btn" id="restartBtn">🔄 RESTART</button>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 11px; text-align: center; opacity: 0.8;">
+            Utilisez les boutons ou glissez sur l'écran pour jouer
+        </div>
+    </div>
+    
+    <div id="skinsTab" class="tab-content">
+        <h2 class="section-title">🎨 Choisir un Skin</h2>
+        <div class="skins-grid">
+            <div class="skin-card active" data-skin="classic">
+                <div class="skin-preview skin-classic"></div>
+                <div class="skin-name">Classique</div>
+                <div class="skin-description">Vert néon traditionnel</div>
+                <div class="skin-unlock-req" style="color: #00ff88;">Débloqué</div>
+            </div>
+            <div class="skin-card locked" data-skin="fire">
+                <div class="skin-preview skin-fire"></div>
+                <div class="skin-name">Feu</div>
+                <div class="skin-description">Rouge flamboyant</div>
+                <div class="skin-unlock-req" style="color: #ff6666;">Score requis: 50</div>
+            </div>
+            <div class="skin-card locked" data-skin="ice">
+                <div class="skin-preview skin-ice"></div>
+                <div class="skin-name">Glace</div>
+                <div class="skin-description">Bleu glacial</div>
+                <div class="skin-unlock-req" style="color: #ff6666;">Score requis: 100</div>
+            </div>
+            <div class="skin-card locked" data-skin="gold">
+                <div class="skin-preview skin-gold"></div>
+                <div class="skin-name">Or</div>
+                <div class="skin-description">Doré précieux</div>
+                <div class="skin-unlock-req" style="color: #ff6666;">Score requis: 200</div>
+            </div>
+            <div class="skin-card locked" data-skin="purple">
+                <div class="skin-preview skin-purple"></div>
+                <div class="skin-name">Violet</div>
+                <div class="skin-description">Mauve mystique</div>
+                <div class="skin-unlock-req" style="color: #ff6666;">Score requis: 300</div>
+            </div>
+            <div class="skin-card locked" data-skin="rainbow">
+                <div class="skin-preview skin-rainbow"></div>
+                <div class="skin-name">Arc-en-ciel</div>
+                <div class="skin-description">Multicolore animé</div>
+                <div class="skin-unlock-req" style="color: #ff6666;">Score requis: 500</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="settingsTab" class="tab-content">
+        <h2 class="section-title">⚙️ Paramètres</h2>
+        
+        <div class="setting-group">
+            <h3>🎮 Vitesse de jeu</h3>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" data-speed="500">🌱 Très Lent</button>
+                <button class="difficulty-btn" data-speed="350">🚶 Lent</button>
+                <button class="difficulty-btn active" data-speed="200">🚀 Normal</button>
+                <button class="difficulty-btn" data-speed="100">⚡ Rapide</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🎨 Graphismes</h3>
+            <div class="setting-option">
+                <span>Effets visuels</span>
+                <div class="toggle-switch active" id="effectsToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Particules</span>
+                <div class="toggle-switch active" id="particlesToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Animations fluides</span>
+                <div class="toggle-switch active" id="animationsToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Mode plein écran</span>
+                <div class="toggle-switch" id="fullscreenToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🔊 Audio & Retour</h3>
+            <div class="setting-option">
+                <span>Sons de jeu</span>
+                <div class="toggle-switch" id="soundToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Vibrations tactiles</span>
+                <div class="toggle-switch active" id="vibrationToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>💾 Données</h3>
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="action-btn restart-btn" onclick="resetAllData()">🗑️ Effacer les données</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="scoresTab" class="tab-content">
+        <h2 class="section-title">🏆 Statistiques</h2>
+        
+        <div class="setting-group">
+            <h3>📊 Vos records</h3>
+            <div class="setting-option">
+                <span>Meilleur score</span>
+                <span id="bestScore">0</span>
+            </div>
+            <div class="setting-option">
+                <span>Parties jouées</span>
+                <span id="gamesPlayed">0</span>
+            </div>
+            <div class="setting-option">
+                <span>Temps de jeu total</span>
+                <span id="totalTime">0min</span>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🎖️ Achievements</h3>
+            <div id="achievementsList">
+                <div class="achievement-item" data-achievement="first-game">
+                    <div class="achievement-icon">🎮</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">Première Partie</div>
+                        <div class="achievement-desc">Jouer votre première partie</div>
+                    </div>
+                    <div class="achievement-status">❌</div>
+                </div>
+                <div class="achievement-item" data-achievement="score-100">
+                    <div class="achievement-icon">💯</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">Centurion</div>
+                        <div class="achievement-desc">Atteindre 100 points</div>
+                    </div>
+                    <div class="achievement-status">❌</div>
+                </div>
+                <div class="achievement-item" data-achievement="score-500">
+                    <div class="achievement-icon">🚀</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">Expert</div>
+                        <div class="achievement-desc">Atteindre 500 points</div>
+                    </div>
+                    <div class="achievement-status">❌</div>
+                </div>
+                <div class="achievement-item" data-achievement="speed-demon">
+                    <div class="achievement-icon">⚡</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">Démon de Vitesse</div>
+                        <div class="achievement-desc">Jouer en mode Rapide</div>
+                    </div>
+                    <div class="achievement-status">❌</div>
+                </div>
+                <div class="achievement-item" data-achievement="collector">
+                    <div class="achievement-icon">🎨</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">Collectionneur</div>
+                        <div class="achievement-desc">Essayer 5 skins différents</div>
+                    </div>
+                    <div class="achievement-status">❌</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>📱 Informations App</h3>
+            <div class="setting-option">
+                <span>Version</span>
+                <span>1.3.0</span>
+            </div>
+        </div>
+    </div>
+    
+    <div id="achievementNotification" class="achievement-notification">
+        <div>🎖️ <strong>Achievement Débloqué!</strong></div>
+        <div id="achievementText">Première Partie</div>
+    </div>
+    
+    <div id="statusMessage" class="status-message">
+        <h2 id="statusTitle">GAME OVER</h2>
+        <p id="statusText">Score: 0</p>
+        <div style="margin-top: 20px;">
+            <button class="action-btn restart-btn" onclick="hideStatus(); restartGame();">🔄 REJOUER</button>
+            <button class="action-btn play-btn" onclick="hideStatus();">✅ OK</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        ctx.imageSmoothingEnabled = false;
+
+        let snake = [];
+        let food = {};
+        let direction = '';
+        let nextDirection = '';
+        let score = 0;
+        let level = 1;
+        let gameRunning = false;
+        let gamePaused = false;
+        let animationId = null;
+        let currentSkin = 'classic';
+        let gameSpeed = 200;
+        let lastFrameTime = 0;
+        let particlePool = [];
+        let triedSkins = new Set(['classic']);
+        
+        let stats = {
+            highScore: 0,
+            gamesPlayed: 0,
+            totalTime: 0
+        };
+
+        let settings = {
+            effects: true,
+            particles: true,
+            animations: true,
+            sound: false,
+            vibration: true,
+            fullscreen: false
+        };
+
+        let achievements = {};
+
+        const skins = {
+            classic: { head: '#00ff88', body: '#00cc66', trail: '#00ff88' },
+            fire: { head: '#ff4444', body: '#ff8800', trail: '#ff4444' },
+            ice: { head: '#4488ff', body: '#88ccff', trail: '#4488ff' },
+            gold: { head: '#ffdd00', body: '#ffaa00', trail: '#ffdd00' },
+            purple: { head: '#8844ff', body: '#cc44ff', trail: '#8844ff' },
+            rainbow: { head: '#ff0088', body: '#00ff88', trail: '#0088ff' }
+        };
+
+        function initializeStats() {
+            stats.highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+            stats.gamesPlayed = parseInt(localStorage.getItem('gamesPlayed')) || 0;
+            stats.totalTime = parseInt(localStorage.getItem('totalTime')) || 0;
+        }
+
+        function loadAchievements() {
+            const achievementKeys = ['first-game', 'score-100', 'score-500', 'speed-demon', 'collector'];
+            achievementKeys.forEach(key => {
+                achievements[key] = localStorage.getItem('achievement-' + key) === 'true';
+            });
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const targetTab = document.getElementById(tabName + 'Tab');
+            const targetBtn = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+            
+            if (targetTab && targetBtn) {
+                targetTab.classList.add('active');
+                targetBtn.classList.add('active');
+            }
+            
+            if (tabName === 'scores') {
+                updateScoresDisplay();
+            } else if (tabName === 'skins') {
+                updateSkinLocks();
+            }
+        }
+
+        function updateSkinLocks() {
+            const skinRequirements = {
+                classic: 0,
+                fire: 50,
+                ice: 100,
+                gold: 200,
+                purple: 300,
+                rainbow: 500
+            };
+            
+            document.querySelectorAll('.skin-card').forEach(card => {
+                const skinName = card.dataset.skin;
+                const required = skinRequirements[skinName];
+                const unlockReq = card.querySelector('.skin-unlock-req');
+                
+                if (stats.highScore >= required) {
+                    card.classList.remove('locked');
+                    if (unlockReq) {
+                        unlockReq.textContent = 'Débloqué';
+                        unlockReq.style.color = '#00ff88';
+                    }
+                } else {
+                    card.classList.add('locked');
+                    if (unlockReq) {
+                        unlockReq.textContent = `Score requis: ${required}`;
+                        unlockReq.style.color = '#ff6666';
+                    }
+                }
+            });
+        }
+
+        function createParticle(x, y, color = '#00ff88') {
+            if (!settings.particles || particlePool.length > 20) return;
+            
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.background = color;
+            document.body.appendChild(particle);
+            
+            particlePool.push(particle);
+            
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                    const index = particlePool.indexOf(particle);
+                    if (index > -1) particlePool.splice(index, 1);
+                }
+            }, 1000);
+        }
+
+        function checkAchievement(achievementId) {
+            if (achievements[achievementId]) return;
+            
+            let unlocked = false;
+            
+            switch(achievementId) {
+                case 'first-game':
+                    unlocked = stats.gamesPlayed >= 1;
+                    break;
+                case 'score-100':
+                    unlocked = score >= 100;
+                    break;
+                case 'score-500':
+                    unlocked = score >= 500;
+                    break;
+                case 'speed-demon':
+                    unlocked = gameSpeed <= 100;
+                    break;
+                case 'collector':
+                    unlocked = triedSkins.size >= 5;
+                    break;
+            }
+            
+            if (unlocked) {
+                unlockAchievement(achievementId);
+            }
+        }
+        
+        function unlockAchievement(achievementId) {
+            achievements[achievementId] = true;
+            localStorage.setItem('achievement-' + achievementId, 'true');
+            
+            const notification = document.getElementById('achievementNotification');
+            const achievementEl = document.querySelector(`[data-achievement="${achievementId}"]`);
+            
+            if (achievementEl) {
+                const achievementName = achievementEl.querySelector('.achievement-name').textContent;
+                
+                document.getElementById('achievementText').textContent = achievementName;
+                notification.classList.add('show');
+                
+                achievementEl.classList.add('unlocked');
+                achievementEl.querySelector('.achievement-status').textContent = '✅';
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function updateScoresDisplay() {
+            const elements = {
+                bestScore: document.getElementById('bestScore'),
+                gamesPlayed: document.getElementById('gamesPlayed'),
+                totalTime: document.getElementById('totalTime')
+            };
+            
+            if (elements.bestScore) elements.bestScore.textContent = stats.highScore;
+            if (elements.gamesPlayed) elements.gamesPlayed.textContent = stats.gamesPlayed;
+            if (elements.totalTime) elements.totalTime.textContent = Math.floor(stats.totalTime / 60) + 'min';
+            
+            Object.keys(achievements).forEach(achievementId => {
+                const achievementEl = document.querySelector(`[data-achievement="${achievementId}"]`);
+                if (achievementEl && achievements[achievementId]) {
+                    achievementEl.classList.add('unlocked');
+                    const statusEl = achievementEl.querySelector('.achievement-status');
+                    if (statusEl) statusEl.textContent = '✅';
+                }
+            });
+        }
+
+        function initGame() {
+            snake = [{x: Math.floor(tileCount/2), y: Math.floor(tileCount/2)}];
+            direction = '';
+            nextDirection = '';
+            score = 0;
+            level = 1;
+            gameRunning = false;
+            gamePaused = false;
+            
+            updateDisplay();
+            hideStatus();
+            generateFood();
+            drawGame();
+        }
+
+        function updateDisplay() {
+            const scoreEl = document.getElementById('score');
+            const levelEl = document.getElementById('level');
+            const highScoreEl = document.getElementById('highScore');
+            
+            if (scoreEl) scoreEl.textContent = score;
+            if (levelEl) levelEl.textContent = level;
+            if (highScoreEl) highScoreEl.textContent = stats.highScore;
+        }
+
+        function generateFood() {
+            do {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (snake.some(segment => segment.x === food.x && segment.y === food.y));
+        }
+
+        function drawGame() {
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (settings.effects) {
+                ctx.strokeStyle = 'rgba(0, 255, 136, 0.1)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i <= tileCount; i++) {
+                    const pos = i * gridSize;
+                    ctx.moveTo(pos, 0);
+                    ctx.lineTo(pos, canvas.height);
+                    ctx.moveTo(0, pos);
+                    ctx.lineTo(canvas.width, pos);
+                }
+                ctx.stroke();
+            }
+
+            if (settings.effects && snake.length > 1) {
+                snake.forEach((segment, index) => {
+                    if (index === 0) return;
+                    const opacity = Math.floor((snake.length - index) / snake.length * 76);
+                    const x = segment.x * gridSize;
+                    const y = segment.y * gridSize;
+                    
+                    ctx.fillStyle = skins[currentSkin].trail + opacity.toString(16).padStart(2, '0');
+                    ctx.fillRect(x + 4, y + 4, gridSize - 8, gridSize - 8);
+                });
+            }
+
+            const foodX = food.x * gridSize;
+            const foodY = food.y * gridSize;
+            
+            ctx.fillStyle = '#ff0088';
+            ctx.fillRect(foodX + 2, foodY + 2, gridSize - 4, gridSize - 4);
+            
+            if (settings.effects) {
+                ctx.save();
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff0088';
+                ctx.fillRect(foodX + 6, foodY + 6, gridSize - 12, gridSize - 12);
+                ctx.restore();
+            }
+
+            snake.forEach((segment, index) => {
+                const x = segment.x * gridSize;
+                const y = segment.y * gridSize;
+                
+                if (index === 0) {
+                    ctx.fillStyle = skins[currentSkin].head;
+                    ctx.fillRect(x + 1, y + 1, gridSize - 2, gridSize - 2);
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x + 4, y + 4, 3, 3);
+                    ctx.fillRect(x + gridSize - 7, y + 4, 3, 3);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(x + 5, y + 5, 1, 1);
+                    ctx.fillRect(x + gridSize - 6, y + 5, 1, 1);
+                } else {
+                    ctx.fillStyle = skins[currentSkin].body;
+                    ctx.fillRect(x + 2, y + 2, gridSize - 4, gridSize - 4);
+                }
+            });
+        }
+
+        function runGameLoop(timestamp) {
+            if (!gameRunning || gamePaused) {
+                if (gameRunning) {
+                    animationId = requestAnimationFrame(runGameLoop);
+                }
+                return;
+            }
+            
+            if (timestamp - lastFrameTime >= gameSpeed) {
+                if (nextDirection) {
+                    direction = nextDirection;
+                    nextDirection = '';
+                }
+                
+                if (direction) {
+                    moveSnake();
+                }
+                
+                checkAchievement('score-100');
+                checkAchievement('score-500');
+                checkAchievement('speed-demon');
+                
+                lastFrameTime = timestamp;
+            }
+            
+            drawGame();
+            animationId = requestAnimationFrame(runGameLoop);
+        }
+
+        function startGame() {
+            if (gameRunning || gamePaused) return;
+            
+            gameRunning = true;
+            lastFrameTime = 0;
+            animationId = requestAnimationFrame(runGameLoop);
+        }
+
+        function moveSnake() {
+            if (!direction || !gameRunning || gamePaused) return;
+
+            const head = {...snake[0]};
+            
+            switch(direction) {
+                case 'up': head.y -= 1; break;
+                case 'down': head.y += 1; break;
+                case 'left': head.x -= 1; break;
+                case 'right': head.x += 1; break;
+            }
+
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                endGame();
+                return;
+            }
+
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                endGame();
+                return;
+            }
+
+            snake.unshift(head);
+
+            if (food && head.x === food.x && head.y === food.y) {
+                let points = 10;
+                
+                score += points;
+                
+                if (settings.particles && food) {
+                    const rect = canvas.getBoundingClientRect();
+                    const canvasX = rect.left + (food.x * gridSize) + gridSize/2;
+                    const canvasY = rect.top + (food.y * gridSize) + gridSize/2;
+                    
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            createParticle(
+                                canvasX + (Math.random() - 0.5) * 40,
+                                canvasY + (Math.random() - 0.5) * 40,
+                                '#ff0088'
+                            );
+                        }, i * 50);
+                    }
+                }
+                
+                const scoreParent = document.querySelector('#score')?.parentElement;
+                if (scoreParent) {
+                    scoreParent.classList.add('highlight');
+                    setTimeout(() => {
+                        scoreParent.classList.remove('highlight');
+                    }, 500);
+                }
+                
+                if (settings.vibration && 'vibrate' in navigator) {
+                    navigator.vibrate(50);
+                }
+                
+                const newLevel = Math.floor(score / 100) + 1;
+                if (newLevel > level) {
+                    level = newLevel;
+                    if (gameSpeed > 50) {
+                        gameSpeed = Math.max(50, gameSpeed - 10);
+                    }
+                    
+                    const levelParent = document.querySelector('#level')?.parentElement;
+                    if (levelParent) {
+                        levelParent.classList.add('highlight');
+                        setTimeout(() => {
+                            levelParent.classList.remove('highlight');
+                        }, 500);
+                    }
+                }
+                
+                updateDisplay();
+                generateFood();
+                
+            } else {
+                snake.pop();
+            }
+        }
+
+        function endGame() {
+            gameRunning = false;
+            gamePaused = false;
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            stats.gamesPlayed++;
+            if (score > stats.highScore) {
+                stats.highScore = score;
+                localStorage.setItem('snakeHighScore', stats.highScore);
+            }
+            localStorage.setItem('gamesPlayed', stats.gamesPlayed);
+            
+            checkAchievement('first-game');
+            
+            updateDisplay();
+            showStatus('GAME OVER', `Score final: ${score}${score === stats.highScore ? ' - NOUVEAU RECORD!' : ''}`);
+            
+            if (settings.vibration && 'vibrate' in navigator) {
+                navigator.vibrate([200, 100, 200]);
+            }
+            
+            if (settings.particles) {
+                const rect = canvas.getBoundingClientRect();
+                const centerX = rect.left + canvas.width / 2;
+                const centerY = rect.top + canvas.height / 2;
+                
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        createParticle(
+                            centerX + (Math.random() - 0.5) * 200,
+                            centerY + (Math.random() - 0.5) * 200,
+                            '#ff0088'
+                        );
+                    }, i * 100);
+                }
+            }
+        }
+
+        function restartGame() {
+            hideStatus();
+            gameRunning = false;
+            gamePaused = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            initGame();
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+            
+            gamePaused = !gamePaused;
+            
+            if (gamePaused) {
+                showStatus('PAUSE', 'Jeu en pause', 'paused');
+            } else {
+                hideStatus();
+                animationId = requestAnimationFrame(runGameLoop);
+            }
+        }
+
+        function showStatus(title, text, type = 'game-over') {
+            const statusTitle = document.getElementById('statusTitle');
+            const statusText = document.getElementById('statusText');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            if (statusTitle) statusTitle.textContent = title;
+            if (statusText) statusText.textContent = text;
+            if (statusMessage) {
+                statusMessage.className = `status-message ${type}`;
+                statusMessage.style.display = 'block';
+            }
+        }
+
+        function hideStatus() {
+            const statusMessage = document.getElementById('statusMessage');
+            if (statusMessage) statusMessage.style.display = 'none';
+        }
+
+        function setDirection(newDirection) {
+            if (!gameRunning && !gamePaused && newDirection) {
+                startGame();
+            }
+            
+            if (gamePaused) return;
+            
+            const opposites = {
+                'up': 'down', 'down': 'up',
+                'left': 'right', 'right': 'left'
+            };
+            
+            if (direction !== opposites[newDirection]) {
+                nextDirection = newDirection;
+            }
+        }
+
+        function resetAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ?')) {
+                const keysToRemove = [
+                    'snakeHighScore', 'gamesPlayed', 'totalTime',
+                    'achievement-first-game', 'achievement-score-100', 'achievement-score-500',
+                    'achievement-speed-demon', 'achievement-collector'
+                ];
+                
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                
+                stats = { highScore: 0, gamesPlayed: 0, totalTime: 0 };
+                loadAchievements();
+                triedSkins = new Set(['classic']);
+                
+                updateDisplay();
+                updateScoresDisplay();
+                updateSkinLocks();
+                initGame();
+            }
+        }
+
+        function toggleFullscreen(enable) {
+            try {
+                if (enable) {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen();
+                    } else if (document.documentElement.mozRequestFullScreen) {
+                        document.documentElement.mozRequestFullScreen();
+                    } else if (document.documentElement.msRequestFullscreen) {
+                        document.documentElement.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            } catch (error) {
+                console.log('Erreur plein écran:', error);
+                // Réinitialiser le toggle si erreur
+                const fullscreenToggle = document.getElementById('fullscreenToggle');
+                if (fullscreenToggle) {
+                    fullscreenToggle.classList.remove('active');
+                    settings.fullscreen = false;
+                }
+            }
+        }
+
+        // Écouter les changements d'état du plein écran
+        function setupFullscreenListeners() {
+            const fullscreenChangeEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'];
+            
+            fullscreenChangeEvents.forEach(event => {
+                document.addEventListener(event, () => {
+                    const isFullscreen = !!(document.fullscreenElement || 
+                                           document.webkitFullscreenElement || 
+                                           document.mozFullScreenElement || 
+                                           document.msFullscreenElement);
+                    
+                    const fullscreenToggle = document.getElementById('fullscreenToggle');
+                    if (fullscreenToggle) {
+                        if (isFullscreen) {
+                            fullscreenToggle.classList.add('active');
+                        } else {
+                            fullscreenToggle.classList.remove('active');
+                        }
+                        settings.fullscreen = isFullscreen;
+                    }
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            const controlButtons = {
+                upBtn: () => setDirection('up'),
+                downBtn: () => setDirection('down'),
+                leftBtn: () => setDirection('left'),
+                rightBtn: () => setDirection('right'),
+                playBtn: () => {
+                    if (!gameRunning) {
+                        startGame();
+                    }
+                },
+                pauseBtn: togglePause,
+                restartBtn: restartGame
+            };
+
+            Object.keys(controlButtons).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('click', controlButtons[id]);
+                }
+            });
+        }
+
+        document.addEventListener('keydown', e => {
+            const keyActions = {
+                'ArrowUp': () => setDirection('up'),
+                'w': () => setDirection('up'),
+                'W': () => setDirection('up'),
+                'ArrowDown': () => setDirection('down'),
+                's': () => setDirection('down'),
+                'S': () => setDirection('down'),
+                'ArrowLeft': () => setDirection('left'),
+                'a': () => setDirection('left'),
+                'A': () => setDirection('left'),
+                'ArrowRight': () => setDirection('right'),
+                'd': () => setDirection('right'),
+                'D': () => setDirection('right'),
+                ' ': () => { if (gameRunning || gamePaused) togglePause(); },
+                'Escape': () => { if (gameRunning || gamePaused) togglePause(); }
+            };
+
+            const action = keyActions[e.key];
+            if (action) {
+                e.preventDefault();
+                action();
+            }
+        });
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function setupTouchControls() {
+            canvas.addEventListener('touchstart', e => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                touchStartX = touch.clientX - rect.left;
+                touchStartY = touch.clientY - rect.top;
+            }, { passive: false });
+            
+            canvas.addEventListener('touchend', e => {
+                e.preventDefault();
+                
+                const touch = e.changedTouches[0];
+                const rect = canvas.getBoundingClientRect();
+                const touchEndX = touch.clientX - rect.left;
+                const touchEndY = touch.clientY - rect.top;
+                
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                const minDistance = 30;
+                
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minDistance) {
+                    setDirection(deltaX > 0 ? 'right' : 'left');
+                } else if (Math.abs(deltaY) > minDistance) {
+                    setDirection(deltaY > 0 ? 'down' : 'up');
+                }
+            }, { passive: false });
+        }
+
+        function setupSkinSelection() {
+            document.querySelectorAll('.skin-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const newSkin = card.dataset.skin;
+                    
+                    if (card.classList.contains('locked')) {
+                        const unlockReq = card.querySelector('.skin-unlock-req').textContent;
+                        showStatus('SKIN VERROUILLÉ', `${unlockReq}. Votre record : ${stats.highScore}`, 'locked');
+                        return;
+                    }
+                    
+                    if (newSkin === currentSkin) return;
+                    
+                    const activeCard = document.querySelector('.skin-card.active');
+                    if (activeCard) activeCard.classList.remove('active');
+                    card.classList.add('active');
+                    
+                    const oldSkin = currentSkin;
+                    currentSkin = newSkin;
+                    triedSkins.add(currentSkin);
+                    
+                    checkAchievement('collector');
+                    
+                    drawGame();
+                    
+                    if (settings.particles && oldSkin !== currentSkin) {
+                        const rect = canvas.getBoundingClientRect();
+                        const centerX = rect.left + canvas.width / 2;
+                        const centerY = rect.top + canvas.height / 2;
+                        
+                        for (let i = 0; i < 5; i++) {
+                            setTimeout(() => {
+                                createParticle(
+                                    centerX + (Math.random() - 0.5) * 100,
+                                    centerY + (Math.random() - 0.5) * 100,
+                                    skins[currentSkin].head
+                                );
+                            }, i * 50);
+                        }
+                    }
+                });
+            });
+        }
+
+        function setupSpeedSettings() {
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const activeBtn = document.querySelector('.difficulty-btn.active');
+                    if (activeBtn) activeBtn.classList.remove('active');
+                    btn.classList.add('active');
+                    
+                    gameSpeed = parseInt(btn.dataset.speed);
+                    checkAchievement('speed-demon');
+                });
+            });
+        }
+
+        function setupToggleSettings() {
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    toggle.classList.toggle('active');
+                    const setting = toggle.id.replace('Toggle', '');
+                    
+                    if (settings.hasOwnProperty(setting)) {
+                        settings[setting] = toggle.classList.contains('active');
+                    }
+                    
+                    // Gestion spécifique du plein écran
+                    if (setting === 'fullscreen') {
+                        toggleFullscreen(settings.fullscreen);
+                    }
+                });
+            });
+        }
+
+        function initializeGame() {
+            initializeStats();
+            loadAchievements();
+            
+            updateDisplay();
+            updateScoresDisplay();
+            updateSkinLocks();
+            setupEventListeners();
+            setupTouchControls();
+            setupSkinSelection();
+            setupSpeedSettings();
+            setupToggleSettings();
+            setupFullscreenListeners();
+            initGame();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeGame);
+        } else {
+            initializeGame();
+        }
+    </script>
+</body>
+</html>
+        
