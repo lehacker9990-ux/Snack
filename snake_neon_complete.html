@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Néon - Mobile</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff88;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        
+        /* Arrière-plan */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+        
+        /* Navigation par onglets */
+        .tab-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #00ff88;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            margin: 0 2px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 11px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .tab-btn.active {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        /* Contenu des onglets */
+        .tab-content {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 15px;
+            display: none;
+            overflow-y: auto;
+            background: #0a0a0a;
+            z-index: 100;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ONGLET JEU */
+        #gameTab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .game-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #00ff88;
+            text-shadow: 0 0 20px #00ff88;
+        }
+        
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #00ff88;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #ff0088;
+            border-radius: 15px;
+            background: #111;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            margin-bottom: 15px;
+            box-shadow: 0 0 30px rgba(255, 0, 136, 0.3);
+        }
+        
+        .game-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .empty { background: none !important; }
+        
+        .game-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            color: #000;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, #ff0088, #8800ff);
+            color: white;
+        }
+        
+        /* ONGLET SKINS */
+        #skinsTab {
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #00ff88;
+            text-shadow: 0 0 15px #00ff88;
+        }
+        
+        .skins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .skin-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .skin-card.active {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        .skin-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .skin-preview {
+            width: 80px;
+            height: 50px;
+            margin: 0 auto 10px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .skin-classic { background: linear-gradient(135deg, #00ff88, #00cc66); }
+        .skin-fire { background: linear-gradient(135deg, #ff4444, #ff8800); }
+        .skin-ice { background: linear-gradient(135deg, #4488ff, #88ccff); }
+        .skin-gold { background: linear-gradient(135deg, #ffdd00, #ffaa00); }
+        .skin-purple { background: linear-gradient(135deg, #8844ff, #cc44ff); }
+        .skin-rainbow { background: linear-gradient(135deg, #ff0088, #00ff88, #0088ff, #ff4400); }
+        .skin-toxic { background: linear-gradient(135deg, #39ff14, #00ff00); }
+        .skin-galaxy { background: linear-gradient(135deg, #4B0082, #9400D3, #FF1493); }
+        
+        .skin-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .skin-description {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        /* ONGLET PARAMÈTRES */
+        #settingsTab {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .setting-group {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-group h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .setting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        
+        .setting-option:not(:last-child) {
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .difficulty-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 12px 15px;
+            border: 2px solid #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #00ff88;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(25px);
+            background: #000;
+        }
+        
+        /* ONGLET SCORES */
+        #scoresTab {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        /* Messages d'état */
+        .status-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #ff0088;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            max-width: 90%;
+        }
+        
+        .status-message h2 {
+            color: #ff0088;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .status-message.game-over h2 {
+            color: #ff0088;
+        }
+        
+        .status-message.paused h2 {
+            color: #ffaa00;
+        }
+        
+        .combo-display {
+            position: fixed;
+            top: 70px;
+            right: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 12px;
+            display: none;
+            z-index: 999;
+        }
+        
+        /* Responsive mobile */
+        @media (max-width: 480px) {
+            .tab-btn {
+                font-size: 9px;
+                padding: 8px 4px;
+            }
+            
+            .game-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+            
+            .stat-item {
+                font-size: 10px;
+                padding: 6px;
+            }
+            
+            .game-header h1 {
+                font-size: 1.5em;
+            }
+            
+            .control-btn {
+                padding: 15px;
+                font-size: 18px;
+            }
+            
+            .skins-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .skin-preview {
+                width: 60px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <!-- Navigation par onglets -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="showTab('game')">🎮 JEU</button>
+        <button class="tab-btn" onclick="showTab('skins')">🎨 SKINS</button>
+        <button class="tab-btn" onclick="showTab('settings')">⚙️ PARAM</button>
+        <button class="tab-btn" onclick="showTab('scores')">🏆 SCORES</button>
+    </div>
+    
+    <!-- ONGLET JEU -->
+    <div id="gameTab" class="tab-content active">
+        <div class="game-header">
+            <h1>🐍 SNAKE NÉON</h1>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div>Score</div>
+                    <div id="score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>Niveau</div>
+                    <div id="level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div>Record</div>
+                    <div id="highScore">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="320" height="320"></canvas>
+        
+        <div class="game-controls">
+            <div class="empty"></div>
+            <button class="control-btn" id="upBtn">↑</button>
+            <div class="empty"></div>
+            <button class="control-btn" id="leftBtn">←</button>
+            <button class="control-btn" id="downBtn">↓</button>
+            <button class="control-btn" id="rightBtn">→</button>
+        </div>
+        
+        <div class="game-actions">
+            <button class="action-btn play-btn" id="playBtn">▶️ JOUER</button>
+            <button class="action-btn pause-btn" id="pauseBtn">⏸️ PAUSE</button>
+            <button class="action-btn restart-btn" id="restartBtn">🔄 RESTART</button>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 11px; text-align: center; opacity: 0.8;">
+            Utilisez les boutons ou glissez sur l'écran pour jouer
+        </div>
+    </div>
+    
+    <!-- ONGLET SKINS -->
+    <div id="skinsTab" class="tab-content">
+        <h2 class="section-title">🎨 Choisir un Skin</h2>
+        <div class="skins-grid">
+            <div class="skin-card active" data-skin="classic">
+                <div class="skin-preview skin-classic"></div>
+                <div class="skin-name">Classique</div>
+                <div class="skin-description">Vert néon traditionnel</div>
+            </div>
+            <div class="skin-card" data-skin="fire">
+                <div class="skin-preview skin-fire"></div>
+                <div class="skin-name">Feu</div>
+                <div class="skin-description">Rouge flamboyant</div>
+            </div>
+            <div class="skin-card" data-skin="ice">
+                <div class="skin-preview skin-ice"></div>
+                <div class="skin-name">Glace</div>
+                <div class="skin-description">Bleu glacial</div>
+            </div>
+            <div class="skin-card" data-skin="gold">
+                <div class="skin-preview skin-gold"></div>
+                <div class="skin-name">Or</div>
+                <div class="skin-description">Doré précieux</div>
+            </div>
+            <div class="skin-card" data-skin="purple">
+                <div class="skin-preview skin-purple"></div>
+                <div class="skin-name">Violet</div>
+                <div class="skin-description">Mauve mystique</div>
+            </div>
+            <div class="skin-card" data-skin="rainbow">
+                <div class="skin-preview skin-rainbow"></div>
+                <div class="skin-name">Arc-en-ciel</div>
+                <div class="skin-description">Multicolore animé</div>
+            </div>
+            <div class="skin-card" data-skin="toxic">
+                <div class="skin-preview skin-toxic"></div>
+                <div class="skin-name">Toxique</div>
+                <div class="skin-description">Vert radioactif</div>
+            </div>
+            <div class="skin-card" data-skin="galaxy">
+                <div class="skin-preview skin-galaxy"></div>
+                <div class="skin-name">Galaxie</div>
+                <div class="skin-description">Espace profond</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ONGLET PARAMÈTRES -->
+    <div id="settingsTab" class="tab-content">
+        <h2 class="section-title">⚙️ Paramètres</h2>
+        
+        <div class="setting-group">
+            <h3>🎮 Vitesse de jeu</h3>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" data-speed="800">🐌 Très Lent</button>
+                <button class="difficulty-btn" data-speed="600">🚶 Lent</button>
+                <button class="difficulty-btn active" data-speed="400">🚀 Normal</button>
+                <button class="difficulty-btn" data-speed="250">⚡ Rapide</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🎨 Graphismes</h3>
+            <div class="setting-option">
+                <span>Effets visuels</span>
+                <div class="toggle-switch active" id="effectsToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Animations fluides</span>
+                <div class="toggle-switch active" id="animationsToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🔊 Audio & Retour</h3>
+            <div class="setting-option">
+                <span>Sons de jeu</span>
+                <div class="toggle-switch" id="soundToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Vibrations tactiles</span>
+                <div class="toggle-switch active" id="vibrationToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>💾 Données</h3>
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="action-btn restart-btn" onclick="resetAllData()">🗑️ Effacer les données</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ONGLET SCORES -->
+    <div id="scoresTab" class="tab-content">
+        <h2 class="section-title">🏆 Statistiques</h2>
+        <div class="setting-group">
+            <h3>📊 Vos records</h3>
+            <div class="setting-option">
+                <span>Meilleur score</span>
+                <span id="bestScore">0</span>
+            </div>
+            <div class="setting-option">
+                <span>Parties jouées</span>
+                <span id="gamesPlayed">0</span>
+            </div>
+            <div class="setting-option">
+                <span>Temps de jeu total</span>
+                <span id="totalTime">0min</span>
+            </div>
+            <div class="setting-option">
+                <span>Meilleur combo</span>
+                <span id="bestCombo">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Affichage combo -->
+    <div id="comboDisplay" class="combo-display">
+        COMBO x<span id="comboMultiplier">1</span>!
+    </div>
+    
+    <!-- Messages d'état -->
+    <div id="statusMessage" class="status-message">
+        <h2 id="statusTitle">GAME OVER</h2>
+        <p id="statusText">Score: 0</p>
+        <div style="margin-top: 20px;">
+            <button class="action-btn restart-btn" onclick="hideStatus(); restartGame();">🔄 REJOUER</button>
+            <button class="action-btn play-btn" onclick="hideStatus();">✅ OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration du jeu optimisée pour mobile
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20; // Taille réduite pour mobile
+        const tileCount = canvas.width / gridSize;
+
+        // Variables de jeu
+        let snake = [];
+        let food = {};
+        let powerUps = [];
+        let particles = [];
+        let direction = '';
+        let nextDirection = '';
+        let score = 0;
+        let level = 1;
+        let combo = 0;
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameInterval = null;
+        let currentSkin = 'classic';
+        let gameSpeed = 400; // Vitesse par défaut plus lente pour mobile
+        let comboTimer = 0;
+        let bestComboThisGame = 0;
+        let lastFoodTime = Date.now();
+        
+        // Statistiques
+        let stats = {
+            highScore: parseInt(localStorage.getItem('snakeHighScore')) || 0,
+            gamesPlayed: parseInt(localStorage.getItem('gamesPlayed')) || 0,
+            totalTime: parseInt(localStorage.getItem('totalTime')) || 0,
+            bestCombo: parseInt(localStorage.getItem('bestCombo')) || 0
+        };
+
+        // Paramètres
+        let settings = {
+            effects: true,
+            animations: true,
+            sound: false,
+            vibration: true
+        };
+
+        // Couleurs des skins
+        const skins = {
+            classic: { head: '#00ff88', body: '#00cc66', shadow: 'rgba(0, 255, 136, 0.4)' },
+            fire: { head: '#ff4444', body: '#ff8800', shadow: 'rgba(255, 68, 68, 0.4)' },
+            ice: { head: '#4488ff', body: '#88ccff', shadow: 'rgba(68, 136, 255, 0.4)' },
+            gold: { head: '#ffdd00', body: '#ffaa00', shadow: 'rgba(255, 221, 0, 0.4)' },
+            purple: { head: '#8844ff', body: '#cc44ff', shadow: 'rgba(136, 68, 255, 0.4)' },
+            rainbow: { head: '#ff0088', body: '#00ff88', shadow: 'rgba(255, 0, 136, 0.4)' },
+            toxic: { head: '#39ff14', body: '#00ff00', shadow: 'rgba(57, 255, 20, 0.4)' },
+            galaxy: { head: '#9400D3', body: '#4B0082', shadow: 'rgba(148, 0, 211, 0.4)' }
+        };
+
+        // Navigation par onglets
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            
+            if (tabName === 'scores') {
+                updateScoresDisplay();
+            }
+        }
+
+        function updateScoresDisplay() {
+            document.getElementById('bestScore').textContent = stats.highScore;
+            document.getElementById('gamesPlayed').textContent = stats.gamesPlayed;
+            document.getElementById('totalTime').textContent = Math.floor(stats.totalTime / 60) + 'min';
+            document.getElementById('bestCombo').textContent = stats.bestCombo;
+        }
+
+        // Initialisation du jeu
+        function initGame() {
+            snake = [{x: Math.floor(tileCount/2), y: Math.floor(tileCount/2)}];
+            direction = '';
+            nextDirection = '';
+            score = 0;
+            level = 1;
+            combo = 0;
+            bestComboThisGame = 0;
+            gameRunning = false;
+            gamePaused = false;
+            powerUps = [];
+            particles = [];
+            comboTimer = 0;
+            lastFoodTime = Date.now();
+            
+            updateDisplay();
+            hideStatus();
+            generateFood();
+            drawGame();
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('highScore').textContent = stats.highScore;
+        }
+
+        function generateFood() {
+            do {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount),
+                    type: Math.random() < 0.9 ? 'normal' : 'bonus'
+                };
+            } while (snake.some(segment => segment.x === food.x && segment.y === food.y));
+
+            // Power-ups occasionnels
+            if (Math.random() < 0.1 && powerUps.length < 1) {
+                generatePowerUp();
+            }
+        }
+
+        function generatePowerUp() {
+            let powerUp;
+            do {
+                powerUp = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount),
+                    type: Math.random() < 0.5 ? 'speed' : 'points',
+                    lifetime: 200
+                };
+            } while (
+                snake.some(segment => segment.x === powerUp.x && segment.y === powerUp.y) ||
+                (food.x === powerUp.x && food.y === powerUp.y)
+            );
+            
+            powerUps.push(powerUp);
+        }
+
+        function drawGame() {
+            // Arrière-plan
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grille légère
+            if (settings.effects) {
+                ctx.strokeStyle = 'rgba(0, 255, 136, 0.05)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= tileCount; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * gridSize, 0);
+                    ctx.lineTo(i * gridSize, canvas.height);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * gridSize);
+                    ctx.lineTo(canvas.width, i * gridSize);
+                    ctx.stroke();
+                }
+            }
+
+            // Dessiner les particules
+            particles.forEach((particle, index) => {
+                ctx.globalAlpha = particle.alpha;
+                ctx.fillStyle = particle.color;
+                ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+                
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.alpha -= 0.03;
+                
+                if (particle.alpha <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+            ctx.globalAlpha = 1;
+
+            // Dessiner la nourriture
+            const foodX = food.x * gridSize;
+            const foodY = food.y * gridSize;
+            
+            const time = Date.now() * 0.003;
+            const pulse = Math.sin(time) * 0.3 + 0.7;
+            
+            if (settings.effects) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = food.type === 'bonus' ? '#ffdd00' : '#ff0088';
+            }
+            
+            ctx.fillStyle = food.type === 'bonus' ? '#ffdd00' : '#ff0088';
+            const size = (gridSize - 4) * pulse;
+            const offset = (gridSize - size) / 2;
+            ctx.fillRect(foodX + offset, foodY + offset, size, size);
+            
+            if (settings.effects) {
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = food.type === 'bonus' ? '#ffffaa' : '#ffccdd';
+                const innerSize = size - 4;
+                const innerOffset = (gridSize - innerSize) / 2;
+                ctx.fillRect(foodX + innerOffset, foodY + innerOffset, innerSize, innerSize);
+            }
+
+            // Dessiner les power-ups
+            powerUps.forEach((powerUp, index) => {
+                const x = powerUp.x * gridSize;
+                const y = powerUp.y * gridSize;
+                
+                const powerUpPulse = Math.sin(Date.now() * 0.01 + index) * 0.3 + 0.7;
+                
+                if (settings.effects) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = powerUp.type === 'speed' ? '#00ccff' : '#ff8800';
+                }
+                
+                ctx.fillStyle = powerUp.type === 'speed' ? '#00ccff' : '#ff8800';
+                const puSize = (gridSize - 6) * powerUpPulse;
+                const puOffset = (gridSize - puSize) / 2;
+                ctx.fillRect(x + puOffset, y + puOffset, puSize, puSize);
+                
+                powerUp.lifetime--;
+                if (powerUp.lifetime <= 0) {
+                    powerUps.splice(index, 1);
+                }
+            });
+
+            ctx.shadowBlur = 0;
+
+            // Dessiner le serpent
+            snake.forEach((segment, index) => {
+                const x = segment.x * gridSize;
+                const y = segment.y * gridSize;
+                
+                if (index === 0) {
+                    // Tête
+                    if (settings.effects) {
+                        ctx.shadowBlur = 12;
+                        ctx.shadowColor = skins[currentSkin].shadow;
+                    }
+                    
+                    if (currentSkin === 'rainbow' && settings.animations) {
+                        const hue = (Date.now() * 0.1) % 360;
+                        ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+                    } else {
+                        ctx.fillStyle = skins[currentSkin].head;
+                    }
+                    
+                    ctx.fillRect(x + 1, y + 1, gridSize - 2, gridSize - 2);
+                    
+                    // Yeux
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x + 4, y + 4, 3, 3);
+                    ctx.fillRect(x + gridSize - 7, y + 4, 3, 3);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(x + 5, y + 5, 1, 1);
+                    ctx.fillRect(x + gridSize - 6, y + 5, 1, 1);
+                } else {
+                    // Corps
+                    if (settings.effects) {
+                        ctx.shadowBlur = Math.max(2, 8 - index);
+                        ctx.shadowColor = skins[currentSkin].shadow;
+                    }
+                    
+                    if (currentSkin === 'rainbow' && settings.animations) {
+                        const hue = (index * 30 + Date.now() * 0.1) % 360;
+                        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                    } else {
+                        ctx.fillStyle = skins[currentSkin].body;
+                    }
+                    
+                    const segmentSize = gridSize - 4 - (index * 0.2);
+                    const offset = (gridSize - segmentSize) / 2;
+                    ctx.fillRect(x + offset, y + offset, segmentSize, segmentSize);
+                }
+            });
+            
+            ctx.shadowBlur = 0;
+        }
+
+        function startGame() {
+            if (gameRunning || gamePaused) return;
+            
+            gameRunning = true;
+            gameInterval = setInterval(() => {
+                if (gamePaused) return;
+                
+                if (nextDirection) {
+                    direction = nextDirection;
+                    nextDirection = '';
+                }
+                
+                if (direction) {
+                    moveSnake();
+                }
+                
+                updateCombo();
+                drawGame();
+            }, gameSpeed);
+        }
+
+        function updateCombo() {
+            if (comboTimer > 0) {
+                comboTimer--;
+                if (comboTimer === 0) {
+                    combo = 0;
+                    document.getElementById('comboDisplay').style.display = 'none';
+                }
+            }
+        }
+
+        function addParticles(x, y, color, count = 3) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x + Math.random() * gridSize,
+                    y: y + Math.random() * gridSize,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    size: Math.random() * 2 + 1,
+                    color: color,
+                    alpha: 1
+                });
+            }
+        }
+
+        function moveSnake() {
+            if (!direction || !gameRunning || gamePaused) return;
+
+            const head = {...snake[0]};
+            
+            switch(direction) {
+                case 'up': head.y -= 1; break;
+                case 'down': head.y += 1; break;
+                case 'left': head.x -= 1; break;
+                case 'right': head.x += 1; break;
+            }
+
+            // Collisions avec les murs
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                endGame();
+                return;
+            }
+
+            // Collisions avec le corps
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                endGame();
+                return;
+            }
+
+            snake.unshift(head);
+
+            // Manger la nourriture
+            if (head.x === food.x && head.y === food.y) {
+                const currentTime = Date.now();
+                const timeSinceLastFood = currentTime - lastFoodTime;
+                
+                let points = food.type === 'bonus' ? 25 : 10;
+                
+                // Système de combo
+                if (timeSinceLastFood < 4000) {
+                    combo++;
+                    comboTimer = 240; // 4 secondes
+                    points *= (1 + combo * 0.3);
+                    
+                    if (combo > bestComboThisGame) {
+                        bestComboThisGame = combo;
+                    }
+                    
+                    document.getElementById('comboDisplay').style.display = 'block';
+                    document.getElementById('comboMultiplier').textContent = combo;
+                } else {
+                    combo = 1;
+                    comboTimer = 240;
+                }
+                
+                score += Math.floor(points);
+                lastFoodTime = currentTime;
+                
+                // Vibration tactile
+                if (settings.vibration && 'vibrate' in navigator) {
+                    navigator.vibrate(50);
+                }
+                
+                // Niveau
+                const newLevel = Math.floor(score / 100) + 1;
+                if (newLevel > level) {
+                    level = newLevel;
+                    if (gameSpeed > 150) {
+                        gameSpeed = Math.max(150, gameSpeed - 8);
+                        clearInterval(gameInterval);
+                        startGame();
+                    }
+                }
+                
+                updateDisplay();
+                generateFood();
+                
+                // Effets visuels
+                canvas.style.boxShadow = '0 0 50px rgba(0, 255, 136, 0.8)';
+                setTimeout(() => {
+                    canvas.style.boxShadow = '0 0 30px rgba(255, 0, 136, 0.3)';
+                }, 200);
+                
+                addParticles(head.x * gridSize, head.y * gridSize, food.type === 'bonus' ? '#ffdd00' : '#ff0088');
+                
+            } else {
+                snake.pop();
+            }
+
+            // Power-ups
+            powerUps.forEach((powerUp, index) => {
+                if (head.x === powerUp.x && head.y === powerUp.y) {
+                    if (powerUp.type === 'speed') {
+                        const oldSpeed = gameSpeed;
+                        gameSpeed = Math.max(100, gameSpeed - 50);
+                        clearInterval(gameInterval);
+                        startGame();
+                        
+                        setTimeout(() => {
+                            gameSpeed = oldSpeed;
+                            if (gameRunning) {
+                                clearInterval(gameInterval);
+                                startGame();
+                            }
+                        }, 5000);
+                    } else {
+                        score += 50;
+                        updateDisplay();
+                    }
+                    
+                    addParticles(powerUp.x * gridSize, powerUp.y * gridSize, powerUp.type === 'speed' ? '#00ccff' : '#ff8800');
+                    powerUps.splice(index, 1);
+                    
+                    if (settings.vibration && 'vibrate' in navigator) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
+                }
+            });
+        }
+
+        function endGame() {
+            gameRunning = false;
+            gamePaused = false;
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+            
+            // Statistiques
+            stats.gamesPlayed++;
+            if (score > stats.highScore) {
+                stats.highScore = score;
+                localStorage.setItem('snakeHighScore', stats.highScore);
+            }
+            if (bestComboThisGame > stats.bestCombo) {
+                stats.bestCombo = bestComboThisGame;
+                localStorage.setItem('bestCombo', stats.bestCombo);
+            }
+            localStorage.setItem('gamesPlayed', stats.gamesPlayed);
+            
+            updateDisplay();
+            showStatus('GAME OVER', `Score final: ${score}${score > stats.highScore ? ' - NOUVEAU RECORD!' : ''}`);
+            
+            if (settings.vibration && 'vibrate' in navigator) {
+                navigator.vibrate([200, 100, 200]);
+            }
+        }
+
+        function restartGame() {
+            hideStatus();
+            initGame();
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+            
+            gamePaused = !gamePaused;
+            
+            if (gamePaused) {
+                showStatus('PAUSE', 'Jeu en pause', 'paused');
+            } else {
+                hideStatus();
+            }
+        }
+
+        function showStatus(title, text, type = 'game-over') {
+            document.getElementById('statusTitle').textContent = title;
+            document.getElementById('statusText').textContent = text;
+            document.getElementById('statusMessage').className = `status-message ${type}`;
+            document.getElementById('statusMessage').style.display = 'block';
+        }
+
+        function hideStatus() {
+            document.getElementById('statusMessage').style.display = 'none';
+            document.getElementById('comboDisplay').style.display = 'none';
+        }
+
+        function setDirection(newDirection) {
+            if (!gameRunning && !gamePaused && newDirection) {
+                startGame();
+            }
+            
+            if (gamePaused) return;
+            
+            const opposites = {
+                'up': 'down', 'down': 'up',
+                'left': 'right', 'right': 'left'
+            };
+            
+            if (direction !== opposites[newDirection]) {
+                nextDirection = newDirection;
+            }
+        }
+
+        function resetAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ?')) {
+                localStorage.clear();
+                stats = { highScore: 0, gamesPlayed: 0, totalTime: 0, bestCombo: 0 };
+                updateDisplay();
+                updateScoresDisplay();
+                initGame();
+            }
+        }
+
+        // Événements des contrôles
+        document.getElementById('upBtn').addEventListener('click', () => setDirection('up'));
+        document.getElementById('downBtn').addEventListener('click', () => setDirection('down'));
+        document.getElementById('leftBtn').addEventListener('click', () => setDirection('left'));
+        document.getElementById('rightBtn').addEventListener('click', () => setDirection('right'));
+        
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (!gameRunning) startGame();
+        });
+        
+        document.getElementById('pauseBtn').addEventListener('click', togglePause);
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
+
+        // Gestion du clavier
+        document.addEventListener('keydown', e => {
+            switch(e.key) {
+                case 'ArrowUp': case 'w': case 'W':
+                    e.preventDefault();
+                    setDirection('up');
+                    break;
+                case 'ArrowDown': case 's': case 'S':
+                    e.preventDefault();
+                    setDirection('down');
+                    break;
+                case 'ArrowLeft': case 'a': case 'A':
+                    e.preventDefault();
+                    setDirection('left');
+                    break;
+                case 'ArrowRight': case 'd': case 'D':
+                    e.preventDefault();
+                    setDirection('right');
+                    break;
+                case ' ': case 'Escape':
+                    e.preventDefault();
+                    if (gameRunning || gamePaused) {
+                        togglePause();
+                    }
+                    break;
+            }
+        });
+
+        // Contrôles tactiles
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            touchStartX = touch.clientX - rect.left;
+            touchStartY = touch.clientY - rect.top;
+        });
+        
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            
+            const touch = e.changedTouches[0];
+            const rect = canvas.getBoundingClientRect();
+            const touchEndX = touch.clientX - rect.left;
+            const touchEndY = touch.clientY - rect.top;
+            
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const minDistance = 30;
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minDistance) {
+                setDirection(deltaX > 0 ? 'right' : 'left');
+            } else if (Math.abs(deltaY) > minDistance) {
+                setDirection(deltaY > 0 ? 'down' : 'up');
+            }
+        });
+
+        // Gestion des skins
+        document.querySelectorAll('.skin-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelector('.skin-card.active').classList.remove('active');
+                card.classList.add('active');
+                currentSkin = card.dataset.skin;
+                if (!gameRunning) drawGame();
+            });
+        });
+
+        // Gestion de la vitesse
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelector('.difficulty-btn.active').classList.remove('active');
+                btn.classList.add('active');
+                gameSpeed = parseInt(btn.dataset.speed);
+                
+                if (gameRunning) {
+                    clearInterval(gameInterval);
+                    startGame();
+                }
+            });
+        });
+
+        // Gestion des toggles
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+                const setting = toggle.id.replace('Toggle', '');
+                if (settings.hasOwnProperty(setting)) {
+                    settings[setting] = toggle.classList.contains('active');
+                }
+            });
+        });
+
+        // Initialisation
+        updateDisplay();
+        updateScoresDisplay();
+        initGame();
+    </script>
+</body>
+</html>
