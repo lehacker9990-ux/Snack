@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Néon - Mobile Optimisé</title>
+    
+    <!-- Meta tags pour PWA -->
+    <meta name="description" content="Snake Néon - Jeu de serpent moderne avec skins et effets visuels">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Snake Néon">
+    
+    <!-- Liens vers le manifest et les icônes -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNuYWtlIE7DqW9uIiwKICAic2hvcnRfbmFtZSI6ICJTbmFrZSIsCiAgImRlc2NyaXB0aW9uIjogIkpldSBkZSBzZXJwZW50IG1vZGVybmUgYXZlYyBza2lucyBldCBlZmZldHMgdmlzdWVscyIsCiAgInN0YXJ0X3VybCI6ICIvIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGEwYTBhIiwKICAidGhlbWVfY29sb3IiOiAiIzAwZmY4OCIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1UazJJaUJvWldsbmFIUTlJakU1TmlJZ2RtbGxkMEp2ZUQwaU1DQXdJREU1TmlBeE9UWWlJR1pwYkd3OUlpTXdNR1ptT0RnaUlIaHRiRzV6UFNKb2RIUndPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMMk41WjJJaVBnbzhjbVZqZENCNFBTSTBJaUI1UFNJMElpQjNhV1IwYUQwaU1UZzRJaUJvWldsbmFIUTlJakU0T0NJZ1ptbHNiRDBpSXpBd1ptWTRPQ0l2UGc4OGNtVmpkQ0I0UFNJeElpQjVQU0l4SWlCM2FXUjBhRDBpTVRrMElpQm9aV2xuYUhROUlqRTVOQ0luUm1sc2JEMGlJekF3TVdFeElDSTFOaUJqUFNJeU5pSTVOaUJqTVRVeElERXdOaUJqTVRVeElERXdOaUJqTVRVeElERXdOaUJqTVRVeElERXdOaUkrUEM5eVpXTjBQZzhzY21WamRDQjRQU0k1TnlJZ2VUMU9PVEkxSWlCM2FXUjBhRDBpTVRBaUlHaGxhV2RvZEQwaU1UQWlJR1pwYkd3OUl6QXdOREpoTXlJdlBqeDBaWGgwSUhZOUlqVXhJaUJvUFNJMU5pSWdkR1Y0ZEMxaGJtTm9iM0k5SW0xcFpHUnNaU0lnWm1sc2JEMGlJekF3Wm1ZNE9DSWdabTl1ZEMxemFYcGxQU0l6TW1CNENBPT0iLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU5UQTBJaUJvWldsbmFIUTlJalV3TkNJZ2RtbGxkMEp2ZUQwaU1DQXdJRFV3TkNBMU1EUXZQZ284Y21WamRDQjRQU0k0SWlCNVBTSTRJaUIzYVdSMGFEMGlORGc0SWlCb1pXbG5hSFE5SWpRNE9DSWdabWxzYkQwaUl6QXdabVk0T0NJdlBnNDhjbVZqZENCNFBTSTBJaUI1UFNJMElpQjNhV1IwYUQwaU5EZ3dJaUJvWldsbmFIUTlJalE0TUNJa1ptbHNiRDBpSXpBd01XRXhJQ0l4TWpNZ2JEQXRNVEl6SXpRek1UTXRNVEl6SXpReVpETXRNVEl6SXpReVpERXRNVEl6SXpReVpERXRNVEl6SXpReVpHNDlNVEl6SXpSemRtRjVjeUJoWVMxelltZHRibVY0ZENKOUtVWnBiR3drWEM5eVpXTjBQZzQ4Y21WamRDQjRQU0kxTnlJZ2VUMHNjR1JoZGdOaUlqQWlJSE5oSWk1bXpBNE1DUnZUV0ptZG1Ob0pFZEJhc25hWkdVaWNxT0VHUERaY2VNdlBnNDhkR1Y0ZENCMlBTSTBPQ0l2UGdBPT0iLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    
+    <!-- Icônes Apple -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTk2IiBoZWlnaHQ9IjE5NiIgdmlld0JveD0iMCAwIDE5NiAxOTYiIGZpbGw9IiMwMGZmODgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIxODgiIGhlaWdodD0iMTg4IiBmaWxsPSIjMDBmZjg4Ii8+CjxyZWN0IHg9IjEiIHk9IjEiIHdpZHRoPSIxOTQiIGhlaWdodD0iMTk0JyFmaWxsPSIjMDAxYTEgQzU2IGM9IjI2Ijk2IGMxNTEgMTA2IGMxNTEgMTA2IGMxNTEgMTA2IGMxNTEgMTA2Ii8+PC9yZWN0PjwscmVjdCB4PSI5NyIgeT05MjUiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzAwNDJhMyIvPjx0ZXh0IHY9IjUxIiBoPSI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwZmY4OCIgZm9udC1zaXplPSIzMkI8QT0iPjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIxODgiIGhlaWdodD0iMTg4IiBmaWxsPSIjMDBmZjg4Ii8+CjxyZWN0IHg9IjEiIHk9IjEiIHdpZHRoPSIxOTQiIGhlaWdodD0iMTk0JmZpbGw9IiMwMDFhMSBDNTYgY0I5NiBjMTUxIDEwNiBjMTUxIDEwNiBjMTUxIDEwNiBjMTUxIDEwNiIvPjwvcmVjdD48cmVjdCB4PSI5NyIgeT05MjUiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzAwNDJhMyIvPjx0ZXh0IHY9IjUxIiBoD0NhIkVIdEVhEckFvT2FmYmNhJEdBas5aZGUiY3OEGPDZceM+Pg48dGV4dCB2PSI0OI8Pg==">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff88;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        
+        /* Notification d'installation */
+        .install-banner {
+            position: fixed;
+            top: -100px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            color: #000;
+            padding: 12px;
+            text-align: center;
+            z-index: 10000;
+            transition: top 0.3s ease;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .install-banner.show {
+            top: 0;
+        }
+        
+        .install-btn {
+            background: #000;
+            color: #00ff88;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 0 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+        }
+        
+        /* Arrière-plan uni */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            z-index: -1;
+        }
+        
+        /* Navigation par onglets */
+        .tab-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #00ff88;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            margin: 0 2px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 11px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .tab-btn.active {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        /* Contenu des onglets */
+        .tab-content {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 15px;
+            display: none;
+            overflow-y: auto;
+            background: #0a0a0a;
+            z-index: 100;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ONGLET JEU */
+        #gameTab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .game-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #00ff88;
+            text-shadow: 0 0 20px #00ff88;
+        }
+        
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #00ff88;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #ff0088;
+            border-radius: 15px;
+            background: #111;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            margin-bottom: 15px;
+            box-shadow: 0 0 30px rgba(255, 0, 136, 0.3);
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        .game-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .empty { background: none !important; }
+        
+        .game-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            color: #000;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, #ff0088, #8800ff);
+            color: white;
+        }
+        
+        /* ONGLET SKINS */
+        #skinsTab {
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #00ff88;
+            text-shadow: 0 0 15px #00ff88;
+        }
+        
+        .skins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .skin-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .skin-card.active {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        .skin-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .skin-preview {
+            width: 80px;
+            height: 50px;
+            margin: 0 auto 10px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .skin-classic { background: linear-gradient(135deg, #00ff88, #00cc66); }
+        .skin-fire { background: linear-gradient(135deg, #ff4444, #ff8800); }
+        .skin-ice { background: linear-gradient(135deg, #4488ff, #88ccff); }
+        .skin-gold { background: linear-gradient(135deg, #ffdd00, #ffaa00); }
+        .skin-purple { background: linear-gradient(135deg, #8844ff, #cc44ff); }
+        .skin-rainbow { background: linear-gradient(135deg, #ff0088, #00ff88, #0088ff, #ff4400); }
+        .skin-toxic { background: linear-gradient(135deg, #39ff14, #00ff00); }
+        .skin-galaxy { background: linear-gradient(135deg, #4B0082, #9400D3, #FF1493); }
+        
+        .skin-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .skin-description {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        /* ONGLET PARAMÈTRES */
+        #settingsTab {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .setting-group {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-group h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .setting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        
+        .setting-option:not(:last-child) {
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .difficulty-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 12px 15px;
+            border: 2px solid #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #00ff88;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(25px);
+            background: #000;
+        }
+        
+        /* ONGLET SCORES */
+        #scoresTab {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        /* Messages d'état */
+        .status-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #ff0088;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            max-width: 90%;
+        }
+        
+        .status-message h2 {
+            color: #ff0088;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .status-message.game-over h2 {
+            color: #ff0088;
+        }
+        
+        .status-message.paused h2 {
+            color: #ffaa00;
+        }
+        
+        .combo-display {
+            position: fixed;
+            top: 70px;
+            right: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 12px;
+            display: none;
+            z-index: 999;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        
+        /* Responsive mobile */
+        @media (max-width: 480px) {
+            .tab-btn {
+                font-size: 9px;
+                padding: 8px 4px;
+            }
+            
+            .game-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+            
+            .stat-item {
+                font-size: 10px;
+                padding: 6px;
+            }
+            
+            .game-header h1 {
+                font-size: 1.5em;
+            }
+            
+            .control-btn {
+                padding: 15px;
+                font-size: 18px;
+            }
+            
+            .skins-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .skin-preview {
+                width: 60px;
+                height: 35px;
+            }
+        }
+        
+        /* Animation de chargement PWA */
+        .app-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        
+        .app-loading.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #00ff88, #0088ff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .loading-text {
+            color: #00ff88;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Écran de chargement PWA -->
+    <div id="appLoading" class="app-loading">
+        <div class="loading-logo">🐍</div>
+        <div class="loading-text">Snake Néon<br>Chargement...</div>
+    </div>
+    
+    <!-- Bannière d'installation -->
+    <div id="installBanner" class="install-banner">
+        📱 Installez Snake Néon sur votre appareil !
+        <button id="installBtn" class="install-btn">Installer</button>
+        <button id="dismissBtn" class="install-btn">Plus tard</button>
+    </div>
+    
+    <div class="bg-grid"></div>
+    
+    <!-- Navigation par onglets -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="showTab('game')">🎮 JEU</button>
+        <button class="tab-btn" onclick="showTab('skins')">🎨 SKINS</button>
+        <button class="tab-btn" onclick="showTab('settings')">⚙️ PARAM</button>
+        <button class="tab-btn" onclick="showTab('scores')">🏆 SCORES</button>
+    </div>
+    
+    <!-- ONGLET JEU -->
+    <div id="gameTab" class="tab-content active">
+        <div class="game-header">
+            <h1>🐍 SNAKE NÉON</h1>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div>Score</div>
+                    <div id="score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>Niveau</div>
+                    <div id="level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div>Record</div>
+                    <div id="highScore">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="320" height="320"></canvas>
+        
+        <div class="game-controls">
+            <div class="empty"></div>
+            <button class="control-btn" id="upBtn">↑</button>
+            <div class="empty"></div>
+            <button class="control-btn" id="leftBtn">←</button>
+            <button class="control-btn" id="downBtn">↓</button>
+            <button class="control-btn" id="rightBtn">→</button>
+        </div>
+        
+        <div class="game-actions">
+            <button class="action-btn play-btn" id="playBtn">▶️ JOUER</button>
+            <button class="action-btn pause-btn" id="pauseBtn">⏸️ PAUSE</button>
+            <button class="action-btn restart-btn" id="restartBtn">🔄 RESTART</button>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 11px; text-align: center; opacity: 0.8;">
+            Utilisez les boutons ou glissez sur l'écran pour jouer
+        </div>
+    </div>
+    
+    <!-- ONGLET SKINS -->
+    <div id="skinsTab" class="tab-content">
+        <h2 class="section-title">🎨 Choisir un Skin</h2>
+        <div class="skins-grid">
+            <div class="skin-card active" data-skin="classic">
+                <div class="skin-preview skin-classic"></div>
+                <div class="skin-name">Classique</div>
+                <div class="skin-description">Vert néon traditionnel</div>
+            </div>
+            <div class="skin-card" data-skin="fire">
+                <div class="skin-preview skin-fire"></div>
+                <div class="skin-name">Feu</div>
+                <div class="skin-description">Rouge flamboyant</div>
+            </div>
+            <div class="skin-card" data-skin="ice">
+                <div class="skin-preview skin-ice"></div>
+                <div class="skin-name">Glace</div>
+                <div class="skin-description">Bleu glacial</div>
+            </div>
+            <div class="skin-card" data-skin="gold">
+                <div class="skin-preview skin-gold"></div>
+                <div class="skin-name">Or</div>
+                <div class="skin-description">Doré précieux</div>
+            </div>
+            <div class="skin-card" data-skin="purple">
+                <div class="skin-preview skin-purple"></div>
+                <div class="skin-name">Violet</div>
+                <div class="skin-description">Mauve mystique</div>
+            </div>
+            <div class="skin-card" data-skin="rainbow">
+                <div class="skin-preview skin-rainbow"></div>
+                <div class="skin-name">Arc-en-ciel</div>
+                <div class="skin-description">Multicolore animé</div>
+            </div>
+            <div class="skin-card" data-skin="toxic">
+                <div class="skin-preview skin-toxic"></div>
+                <div class="skin-name">Toxique</div>
+                <div class="skin-description">Vert radioactif</div>
+            </div>
+            <div class="skin-card" data-skin="galaxy">
+                <div class="skin-preview skin-galaxy"></div>
+                <div class="skin-name">Galaxie</div>
+                <div class="skin-description">Espace profond</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ONGLET PARAMÈTRES -->
+    <div id="settingsTab" class="tab-content">
+        <h2 class="section-title">⚙️ Paramètres</h2>
+        
+        <div class="setting-group">
+            <h3>🎮 Vitesse de jeu</h3>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" data-speed="800">🌍 Très Lent</button>
+                <button class="difficulty-btn" data-speed="600">🚶 Lent</button>
+                <button class="difficulty-btn active" data-speed="400">🚀 Normal</button>
+                <button class="difficulty-btn" data-speed="250">⚡ Rapide</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🎨 Graphismes</h3>
+            <div class="setting-option">
+                <span>Effets visuels</span>
+                <div class="toggle-switch active" id="effectsToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Animations fluides</span>
+                <div class="toggle-switch active" id="animationsToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>🔊 Audio & Retour</h3>
+            <div class="setting-option">
+                <span>Sons de jeu</span>
+                <div class="toggle-switch" id="soundToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-option">
+                <span>Vibrations tactiles</span>
+                <div class="toggle-switch active" id="vibrationToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>📱 Application</h3>
+            <div class="setting-option">
+                <span>Mode plein écran</span>
+                <div class="toggle-switch" id="fullscreenToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="action-btn play-btn" onclick="showInstallBanner()">📱 Installer l'app</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>💾 Données</h3>
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="action-btn restart-btn" onclick="resetAllData()">🗑️ Effacer les données</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ONGLET SCORES -->
+    <div id="scoresTab" class="tab-content">
+        <h2 class="section-title">🏆 Statistiques</h2>
+        <div class="setting-group">
+            <h3>📊 Vos records</h3>
+            <div class="setting-option">
+                <span>Meilleur score</span>
+                <span id="bestScore">0</span>
+            </div>
+            <div class="setting-option">
+                <span>Parties jouées</span>
+                <span id="gamesPlayed">0</span>
+            </div>
+            <div class="setting-option">
+                <span>Temps de jeu total</span>
+                <span id="totalTime">0min</span>
+            </div>
+            <div class="setting-option">
+                <span>Meilleur combo</span>
+                <span id="bestCombo">0</span>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>📱 Informations App</h3>
+            <div class="setting-option">
+                <span>Version</span>
+                <span>1.0.0</span>
+            </div>
+            <div class="setting-option">
+                <span>Type d'installation</span>
+                <span id="installType">Web</span>
+            </div>
+            <div class="setting-option">
+                <span>Status PWA</span>
+                <span id="pwaStatus">❌ Non installé</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Affichage combo -->
+    <div id="comboDisplay" class="combo-display">
+        COMBO x<span id="comboMultiplier">1</span>!
+    </div>
+    
+    <!-- Messages d'état -->
+    <div id="statusMessage" class="status-message">
+        <h2 id="statusTitle">GAME OVER</h2>
+        <p id="statusText">Score: 0</p>
+        <div style="margin-top: 20px;">
+            <button class="action-btn restart-btn" onclick="hideStatus(); restartGame();">🔄 REJOUER</button>
+            <button class="action-btn play-btn" onclick="hideStatus();">✅ OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables PWA
+        let deferredPrompt;
+        let isInstalled = false;
+        let installBannerShown = localStorage.getItem('installBannerDismissed') !== 'true';
+        
+        // Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(createServiceWorkerBlob())
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                        updatePWAStatus();
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        function createServiceWorkerBlob() {
+            const swCode = `
+                const CACHE_NAME = 'snake-neon-v1';
+                const urlsToCache = [
+                    '/',
+                    '/index.html'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                return cache.addAll(urlsToCache);
+                            })
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => {
+                                if (response) {
+                                    return response;
+                                }
+                                return fetch(event.request);
+                            })
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            return URL.createObjectURL(blob);
+        }
+        
+        // Détection PWA
+        function updatePWAStatus() {
+            const pwaStatusEl = document.getElementById('pwaStatus');
+            const installTypeEl = document.getElementById('installType');
+            
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                pwaStatusEl.textContent = '✅ Installé';
+                installTypeEl.textContent = 'PWA';
+                isInstalled = true;
+            } else if ('serviceWorker' in navigator) {
+                pwaStatusEl.textContent = '🔄 Prêt pour installation';
+                installTypeEl.textContent = 'Web PWA';
+            } else {
+                pwaStatusEl.textContent = '❌ Non supporté';
+                installTypeEl.textContent = 'Web';
+            }
+        }
+        
+        // Gestion installation PWA
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            if (installBannerShown) {
+                showInstallBanner();
+            }
+        });
+        
+        function showInstallBanner() {
+            if (!deferredPrompt && !isInstalled) {
+                alert('Installation PWA non disponible sur ce navigateur. Utilisez Chrome, Firefox ou Safari pour installer l\'application.');
+                return;
+            }
+            
+            if (isInstalled) {
+                alert('L\'application est déjà installée!');
+                return;
+            }
+            
+            document.getElementById('installBanner').classList.add('show');
+        }
+        
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.choiceResult;
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                isInstalled = true;
+                updatePWAStatus();
+            }
+            
+            deferredPrompt = null;
+            document.getElementById('installBanner').classList.remove('show');
+        });
+        
+        document.getElementById('dismissBtn').addEventListener('click', () => {
+            document.getElementById('installBanner').classList.remove('show');
+            localStorage.setItem('installBannerDismissed', 'true');
+            installBannerShown = false;
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            isInstalled = true;
+            updatePWAStatus();
+            document.getElementById('installBanner').classList.remove('show');
+        });
+        
+        // Configuration du jeu optimisée pour mobile
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        // Optimisation du contexte canvas
+        ctx.imageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.mozImageSmoothingEnabled = false;
+
+        // Variables de jeu
+        let snake = [];
+        let food = {};
+        let powerUps = [];
+        let particles = [];
+        let direction = '';
+        let nextDirection = '';
+        let score = 0;
+        let level = 1;
+        let combo = 0;
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameInterval = null;
+        let animationFrame = null;
+        let currentSkin = 'classic';
+        let gameSpeed = 400;
+        let comboTimer = 0;
+        let bestComboThisGame = 0;
+        let lastFoodTime = Date.now();
+        let lastUpdateTime = 0;
+        let gameTime = 0;
+        
+        // Variables pour l'interpolation fluide
+        let snakePositions = [];
+        let interpolationProgress = 0;
+        
+        // Statistiques
+        let stats = {
+            highScore: parseInt(localStorage.getItem('snakeHighScore')) || 0,
+            gamesPlayed: parseInt(localStorage.getItem('gamesPlayed')) || 0,
+            totalTime: parseInt(localStorage.getItem('totalTime')) || 0,
+            bestCombo: parseInt(localStorage.getItem('bestCombo')) || 0
+        };
+
+        // Paramètres
+        let settings = {
+            effects: true,
+            animations: true,
+            sound: false,
+            vibration: true,
+            fullscreen: false
+        };
+
+        // Couleurs des skins
+        const skins = {
+            classic: { head: '#00ff88', body: '#00cc66', shadow: 'rgba(0, 255, 136, 0.4)' },
+            fire: { head: '#ff4444', body: '#ff8800', shadow: 'rgba(255, 68, 68, 0.4)' },
+            ice: { head: '#4488ff', body: '#88ccff', shadow: 'rgba(68, 136, 255, 0.4)' },
+            gold: { head: '#ffdd00', body: '#ffaa00', shadow: 'rgba(255, 221, 0, 0.4)' },
+            purple: { head: '#8844ff', body: '#cc44ff', shadow: 'rgba(136, 68, 255, 0.4)' },
+            rainbow: { head: '#ff0088', body: '#00ff88', shadow: 'rgba(255, 0, 136, 0.4)' },
+            toxic: { head: '#39ff14', body: '#00ff00', shadow: 'rgba(57, 255, 20, 0.4)' },
+            galaxy: { head: '#9400D3', body: '#4B0082', shadow: 'rgba(148, 0, 211, 0.4)' }
+        };
+
+        // Détection automatique des performances
+        let performanceMode = 'auto';
+        let frameCount = 0;
+        let lastFpsCheck = performance.now();
+        let currentFps = 60;
+
+        function checkPerformance() {
+            frameCount++;
+            const currentTime = performance.now();
+            
+            if (currentTime - lastFpsCheck >= 1000) {
+                currentFps = frameCount;
+                frameCount = 0;
+                lastFpsCheck = currentTime;
+                
+                // Nettoyage de mémoire préventif à haut niveau
+                if (level > 15) {
+                    if (particles.length > 8) {
+                        particles.splice(0, particles.length - 8);
+                    }
+                    
+                    if (powerUps.length > 1) {
+                        powerUps.splice(0, powerUps.length - 1);
+                    }
+                }
+                
+                if (performanceMode === 'auto') {
+                    if (currentFps < 25) {
+                        settings.effects = false;
+                        settings.animations = false;
+                        particles.length = 0;
+                    } else if (currentFps > 45 && level < 10) {
+                        settings.effects = true;
+                        settings.animations = true;
+                    }
+                }
+                
+                if (currentFps < 15) {
+                    particles.length = 0;
+                    powerUps.length = 0;
+                    settings.effects = false;
+                    settings.animations = false;
+                }
+            }
+        }
+
+        // Gestion plein écran
+        document.getElementById('fullscreenToggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            settings.fullscreen = this.classList.contains('active');
+            
+            if (settings.fullscreen) {
+                enterFullscreen();
+            } else {
+                exitFullscreen();
+            }
+        });
+        
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+        
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Navigation par onglets
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            
+            if (tabName === 'scores') {
+                updateScoresDisplay();
+            }
+        }
+
+        function updateScoresDisplay() {
+            document.getElementById('bestScore').textContent = stats.highScore;
+            document.getElementById('gamesPlayed').textContent = stats.gamesPlayed;
+            document.getElementById('totalTime').textContent = Math.floor(stats.totalTime / 60) + 'min';
+            document.getElementById('bestCombo').textContent = stats.bestCombo;
+            updatePWAStatus();
+        }
+
+        // Initialisation du jeu
+        function initGame() {
+            snake = [{x: Math.floor(tileCount/2), y: Math.floor(tileCount/2)}];
+            snakePositions = [{x: snake[0].x, y: snake[0].y}];
+            direction = '';
+            nextDirection = '';
+            score = 0;
+            level = 1;
+            combo = 0;
+            bestComboThisGame = 0;
+            gameRunning = false;
+            gamePaused = false;
+            powerUps = [];
+            particles = [];
+            comboTimer = 0;
+            lastFoodTime = Date.now();
+            interpolationProgress = 0;
+            gameTime = 0;
+            lastUpdateTime = 0;
+            
+            updateDisplay();
+            hideStatus();
+            generateFood();
+            startRenderLoop();
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('highScore').textContent = stats.highScore;
+        }
+
+        function generateFood() {
+            do {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount),
+                    type: Math.random() < 0.9 ? 'normal' : 'bonus'
+                };
+            } while (snake.some(segment => segment.x === food.x && segment.y === food.y));
+
+            if (Math.random() < 0.1 && powerUps.length < 1) {
+                generatePowerUp();
+            }
+        }
+
+        function generatePowerUp() {
+            let powerUp;
+            do {
+                powerUp = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount),
+                    type: Math.random() < 0.5 ? 'speed' : 'points',
+                    lifetime: 200
+                };
+            } while (
+                snake.some(segment => segment.x === powerUp.x && segment.y === powerUp.y) ||
+                (food.x === powerUp.x && food.y === powerUp.y)
+            );
+            
+            powerUps.push(powerUp);
+        }
+
+        // Boucle de rendu séparée pour la fluidité
+        function startRenderLoop() {
+            function render() {
+                checkPerformance();
+                
+                if (!gamePaused) {
+                    drawGame();
+                }
+                animationFrame = requestAnimationFrame(render);
+            }
+            render();
+        }
+
+        function stopRenderLoop() {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+        }
+
+        function drawGame() {
+            // Fond uni simple
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dessiner les particules avec optimisation
+            if (particles.length > 0) {
+                ctx.save();
+                particles.forEach((particle, index) => {
+                    if (particle.alpha > 0.1) {
+                        ctx.globalAlpha = particle.alpha;
+                        ctx.fillStyle = particle.color;
+                        ctx.fillRect(Math.round(particle.x), Math.round(particle.y), particle.size, particle.size);
+                    }
+                    
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.alpha -= 0.04;
+                    particle.vx *= 0.98;
+                    particle.vy *= 0.98;
+                    
+                    if (particle.alpha <= 0.1) {
+                        particles.splice(index, 1);
+                    }
+                });
+                ctx.restore();
+            }
+
+            // Dessiner la nourriture avec animation optimisée
+            const foodX = food.x * gridSize;
+            const foodY = food.y * gridSize;
+            
+            const time = performance.now() * 0.003;
+            const pulse = Math.sin(time) * 0.2 + 0.8;
+            
+            ctx.save();
+            if (settings.effects) {
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = food.type === 'bonus' ? '#ffdd00' : '#ff0088';
+            }
+            
+            ctx.fillStyle = food.type === 'bonus' ? '#ffdd00' : '#ff0088';
+            const size = (gridSize - 4) * pulse;
+            const offset = (gridSize - size) / 2;
+            ctx.fillRect(Math.round(foodX + offset), Math.round(foodY + offset), Math.round(size), Math.round(size));
+            
+            if (settings.effects) {
+                ctx.shadowBlur = 5;
+                ctx.fillStyle = food.type === 'bonus' ? '#ffffaa' : '#ffccdd';
+                const innerSize = size - 4;
+                const innerOffset = (gridSize - innerSize) / 2;
+                ctx.fillRect(Math.round(foodX + innerOffset), Math.round(foodY + innerOffset), Math.round(innerSize), Math.round(innerSize));
+            }
+            ctx.restore();
+
+            // Dessiner les power-ups avec optimisation
+            if (powerUps.length > 0) {
+                ctx.save();
+                powerUps.forEach((powerUp, index) => {
+                    const x = powerUp.x * gridSize;
+                    const y = powerUp.y * gridSize;
+                    
+                    const powerUpPulse = Math.sin(performance.now() * 0.008 + index) * 0.2 + 0.8;
+                    
+                    if (settings.effects) {
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = powerUp.type === 'speed' ? '#00ccff' : '#ff8800';
+                    }
+                    
+                    ctx.fillStyle = powerUp.type === 'speed' ? '#00ccff' : '#ff8800';
+                    const puSize = (gridSize - 6) * powerUpPulse;
+                    const puOffset = (gridSize - puSize) / 2;
+                    ctx.fillRect(Math.round(x + puOffset), Math.round(y + puOffset), Math.round(puSize), Math.round(puSize));
+                    
+                    powerUp.lifetime--;
+                    if (powerUp.lifetime <= 0) {
+                        powerUps.splice(index, 1);
+                    }
+                });
+                ctx.restore();
+            }
+
+            // Dessiner le serpent avec interpolation fluide
+            drawSnakeSmooth();
+        }
+
+        function drawSnakeSmooth() {
+            if (snake.length === 0) return;
+
+            ctx.save();
+            
+            const smoothProgress = settings.animations ? interpolationProgress : 1;
+            
+            snake.forEach((segment, index) => {
+                let x, y;
+                
+                if (snakePositions.length > index && gameRunning && !gamePaused) {
+                    const prevPos = snakePositions[index] || segment;
+                    x = (prevPos.x + (segment.x - prevPos.x) * smoothProgress) * gridSize;
+                    y = (prevPos.y + (segment.y - prevPos.y) * smoothProgress) * gridSize;
+                } else {
+                    x = segment.x * gridSize;
+                    y = segment.y * gridSize;
+                }
+                
+                if (index === 0) {
+                    if (settings.effects) {
+                        ctx.shadowBlur = 12;
+                        ctx.shadowColor = skins[currentSkin].shadow;
+                    }
+                    
+                    if (currentSkin === 'rainbow' && settings.animations) {
+                        const hue = (performance.now() * 0.1) % 360;
+                        ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+                    } else {
+                        ctx.fillStyle = skins[currentSkin].head;
+                    }
+                    
+                    const headSize = gridSize - 2;
+                    ctx.fillRect(x + 1, y + 1, headSize, headSize);
+                    
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x + 4, y + 4, 3, 3);
+                    ctx.fillRect(x + gridSize - 7, y + 4, 3, 3);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(x + 5, y + 5, 1, 1);
+                    ctx.fillRect(x + gridSize - 6, y + 5, 1, 1);
+                } else {
+                    if (settings.effects) {
+                        ctx.shadowBlur = Math.max(2, 8 - index * 0.5);
+                        ctx.shadowColor = skins[currentSkin].shadow;
+                    }
+                    
+                    if (currentSkin === 'rainbow' && settings.animations) {
+                        const hue = (index * 30 + performance.now() * 0.1) % 360;
+                        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                    } else {
+                        ctx.fillStyle = skins[currentSkin].body;
+                    }
+                    
+                    const segmentSize = Math.max(gridSize - 6, gridSize - 4 - (index * 0.3));
+                    const offset = (gridSize - segmentSize) / 2;
+                    
+                    ctx.fillRect(x + offset, y + offset, segmentSize, segmentSize);
+                }
+            });
+            
+            ctx.restore();
+        }
+
+        function startGame() {
+            if (gameRunning || gamePaused) return;
+            
+            gameRunning = true;
+            lastUpdateTime = performance.now();
+            
+            gameInterval = setInterval(() => {
+                if (gamePaused) return;
+                
+                const currentTime = performance.now();
+                gameTime = currentTime;
+                
+                snakePositions = snake.map(segment => ({...segment}));
+                interpolationProgress = 0;
+                
+                if (nextDirection) {
+                    direction = nextDirection;
+                    nextDirection = '';
+                }
+                
+                if (direction) {
+                    moveSnake();
+                }
+                
+                updateCombo();
+                lastUpdateTime = currentTime;
+                
+            }, gameSpeed);
+
+            function interpolateMovement() {
+                if (!gameRunning || gamePaused) {
+                    requestAnimationFrame(interpolateMovement);
+                    return;
+                }
+                
+                const currentTime = performance.now();
+                const timeSinceUpdate = currentTime - lastUpdateTime;
+                interpolationProgress = Math.min(timeSinceUpdate / gameSpeed, 1);
+                
+                requestAnimationFrame(interpolateMovement);
+            }
+            
+            interpolateMovement();
+        }
+
+        function updateCombo() {
+            if (comboTimer > 0) {
+                comboTimer--;
+                if (comboTimer === 0) {
+                    combo = 0;
+                    document.getElementById('comboDisplay').style.display = 'none';
+                }
+            }
+        }
+
+        function addParticles(x, y, color, count = 5) {
+            if (!settings.effects) return;
+            
+            const maxParticles = 20;
+            if (particles.length > maxParticles) {
+                particles.splice(0, particles.length - maxParticles);
+            }
+            
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x + Math.random() * gridSize,
+                    y: y + Math.random() * gridSize,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    size: Math.random() * 3 + 1,
+                    color: color,
+                    alpha: 1,
+                    life: 60
+                });
+            }
+        }
+
+        function moveSnake() {
+            if (!direction || !gameRunning || gamePaused) return;
+
+            const head = {...snake[0]};
+            
+            switch(direction) {
+                case 'up': head.y -= 1; break;
+                case 'down': head.y += 1; break;
+                case 'left': head.x -= 1; break;
+                case 'right': head.x += 1; break;
+            }
+
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                endGame();
+                return;
+            }
+
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                endGame();
+                return;
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                const currentTime = Date.now();
+                const timeSinceLastFood = currentTime - lastFoodTime;
+                
+                let points = food.type === 'bonus' ? 25 : 10;
+                
+                if (timeSinceLastFood < 4000) {
+                    combo++;
+                    comboTimer = 240;
+                    points *= (1 + combo * 0.3);
+                    
+                    if (combo > bestComboThisGame) {
+                        bestComboThisGame = combo;
+                    }
+                    
+                    document.getElementById('comboDisplay').style.display = 'block';
+                    document.getElementById('comboMultiplier').textContent = combo;
+                } else {
+                    combo = 1;
+                    comboTimer = 240;
+                }
+                
+                score += Math.floor(points);
+                lastFoodTime = currentTime;
+                
+                if (settings.vibration && 'vibrate' in navigator) {
+                    navigator.vibrate(50);
+                }
+                
+                const newLevel = Math.floor(score / 100) + 1;
+                if (newLevel > level) {
+                    level = newLevel;
+                    if (gameSpeed > 150) {
+                        gameSpeed = Math.max(150, gameSpeed - 8);
+                        if (gameInterval) {
+                            clearInterval(gameInterval);
+                            gameInterval = setInterval(() => {
+                                if (gamePaused) return;
+                                
+                                const currentTime = performance.now();
+                                gameTime = currentTime;
+                                
+                                snakePositions = snake.map(segment => ({...segment}));
+                                interpolationProgress = 0;
+                                
+                                if (nextDirection) {
+                                    direction = nextDirection;
+                                    nextDirection = '';
+                                }
+                                
+                                if (direction) {
+                                    moveSnake();
+                                }
+                                
+                                updateCombo();
+                                lastUpdateTime = currentTime;
+                                
+                            }, gameSpeed);
+                        }
+                    }
+                }
+                
+                updateDisplay();
+                generateFood();
+                
+                canvas.style.boxShadow = '0 0 50px rgba(0, 255, 136, 0.8)';
+                setTimeout(() => {
+                    canvas.style.boxShadow = '0 0 30px rgba(255, 0, 136, 0.3)';
+                }, 200);
+                
+                addParticles(head.x * gridSize, head.y * gridSize, food.type === 'bonus' ? '#ffdd00' : '#ff0088');
+                
+            } else {
+                snake.pop();
+            }
+
+            powerUps.forEach((powerUp, index) => {
+                if (head.x === powerUp.x && head.y === powerUp.y) {
+                    if (powerUp.type === 'speed') {
+                        const oldSpeed = gameSpeed;
+                        gameSpeed = Math.max(100, gameSpeed - 50);
+                        clearInterval(gameInterval);
+                        startGame();
+                        
+                        setTimeout(() => {
+                            gameSpeed = oldSpeed;
+                            if (gameRunning) {
+                                clearInterval(gameInterval);
+                                startGame();
+                            }
+                        }, 5000);
+                    } else {
+                        score += 50;
+                        updateDisplay();
+                    }
+                    
+                    addParticles(powerUp.x * gridSize, powerUp.y * gridSize, powerUp.type === 'speed' ? '#00ccff' : '#ff8800');
+                    powerUps.splice(index, 1);
+                    
+                    if (settings.vibration && 'vibrate' in navigator) {
+                        navigator.vibrate([30, 30, 30]);
+                    }
+                }
+            });
+        }
+
+        function endGame() {
+            gameRunning = false;
+            gamePaused = false;
+            interpolationProgress = 1;
+            
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+            
+            particles.length = 0;
+            powerUps.length = 0;
+            snakePositions.length = 0;
+            
+            stats.gamesPlayed = Math.min(stats.gamesPlayed + 1, 99999);
+            if (score > stats.highScore) {
+                stats.highScore = Math.min(score, 999999);
+                localStorage.setItem('snakeHighScore', stats.highScore);
+            }
+            if (bestComboThisGame > stats.bestCombo) {
+                stats.bestCombo = Math.min(bestComboThisGame, 999);
+                localStorage.setItem('bestCombo', stats.bestCombo);
+            }
+            localStorage.setItem('gamesPlayed', stats.gamesPlayed);
+            
+            updateDisplay();
+            showStatus('GAME OVER', `Score final: ${score}${score === stats.highScore ? ' - NOUVEAU RECORD!' : ''}`);
+            
+            if (settings.vibration && 'vibrate' in navigator) {
+                navigator.vibrate([200, 100, 200]);
+            }
+
+            if (settings.effects && level < 15) {
+                canvas.style.filter = 'brightness(0.7) contrast(1.2)';
+                setTimeout(() => {
+                    canvas.style.filter = 'none';
+                }, 800);
+            }
+            
+            setTimeout(() => {
+                particles.length = 0;
+                powerUps.length = 0;
+            }, 1000);
+        }
+
+        function restartGame() {
+            hideStatus();
+            
+            if (settings.effects) {
+                canvas.style.transition = 'transform 0.2s ease';
+                canvas.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    canvas.style.transform = 'scale(1)';
+                    canvas.style.transition = '';
+                }, 200);
+            }
+            
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+            
+            initGame();
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+            
+            gamePaused = !gamePaused;
+            
+            if (gamePaused) {
+                showStatus('PAUSE', 'Jeu en pause', 'paused');
+            } else {
+                hideStatus();
+            }
+        }
+
+        function showStatus(title, text, type = 'game-over') {
+            document.getElementById('statusTitle').textContent = title;
+            document.getElementById('statusText').textContent = text;
+            document.getElementById('statusMessage').className = `status-message ${type}`;
+            document.getElementById('statusMessage').style.display = 'block';
+        }
+
+        function hideStatus() {
+            document.getElementById('statusMessage').style.display = 'none';
+            document.getElementById('comboDisplay').style.display = 'none';
+        }
+
+        function setDirection(newDirection) {
+            if (!gameRunning && !gamePaused && newDirection) {
+                startGame();
+            }
+            
+            if (gamePaused) return;
+            
+            const opposites = {
+                'up': 'down', 'down': 'up',
+                'left': 'right', 'right': 'left'
+            };
+            
+            if (direction !== opposites[newDirection]) {
+                nextDirection = newDirection;
+            }
+        }
+
+        function resetAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les données ?')) {
+                localStorage.clear();
+                stats = { highScore: 0, gamesPlayed: 0, totalTime: 0, bestCombo: 0 };
+                updateDisplay();
+                updateScoresDisplay();
+                initGame();
+            }
+        }
+
+        // Événements des contrôles
+        document.getElementById('upBtn').addEventListener('click', () => setDirection('up'));
+        document.getElementById('downBtn').addEventListener('click', () => setDirection('down'));
+        document.getElementById('leftBtn').addEventListener('click', () => setDirection('left'));
+        document.getElementById('rightBtn').addEventListener('click', () => setDirection('right'));
+        
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (!gameRunning) startGame();
+        });
+        
+        document.getElementById('pauseBtn').addEventListener('click', togglePause);
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
+
+        // Gestion du clavier
+        document.addEventListener('keydown', e => {
+            switch(e.key) {
+                case 'ArrowUp': case 'w': case 'W':
+                    e.preventDefault();
+                    setDirection('up');
+                    break;
+                case 'ArrowDown': case 's': case 'S':
+                    e.preventDefault();
+                    setDirection('down');
+                    break;
+                case 'ArrowLeft': case 'a': case 'A':
+                    e.preventDefault();
+                    setDirection('left');
+                    break;
+                case 'ArrowRight': case 'd': case 'D':
+                    e.preventDefault();
+                    setDirection('right');
+                    break;
+                case ' ': case 'Escape':
+                    e.preventDefault();
+                    if (gameRunning || gamePaused) {
+                        togglePause();
+                    }
+                    break;
+            }
+        });
+
+        // Contrôles tactiles optimisés
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let lastSwipeTime = 0;
+        const swipeDebounceTime = 150;
+
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            touchStartX = touch.clientX - rect.left;
+            touchStartY = touch.clientY - rect.top;
+        }, { passive: false });
+        
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            
+            const currentTime = performance.now();
+            if (currentTime - lastSwipeTime < swipeDebounceTime) return;
+            
+            const touch = e.changedTouches[0];
+            const rect = canvas.getBoundingClientRect();
+            const touchEndX = touch.clientX - rect.left;
+            const touchEndY = touch.clientY - rect.top;
+            
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const minDistance = 25;
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minDistance) {
+                setDirection(deltaX > 0 ? 'right' : 'left');
+                lastSwipeTime = currentTime;
+            } else if (Math.abs(deltaY) > minDistance) {
+                setDirection(deltaY > 0 ? 'down' : 'up');
+                lastSwipeTime = currentTime;
+            }
+        }, { passive: false });
+
+        // Gestion des skins
+        document.querySelectorAll('.skin-card').forEach(card => {
+            card.addEventListener('click', () => {
+                if (card.dataset.skin === currentSkin) return;
+                
+                document.querySelector('.skin-card.active').classList.remove('active');
+                card.classList.add('active');
+                
+                currentSkin = card.dataset.skin;
+                
+                if (settings.effects && !gameRunning) {
+                    canvas.style.transition = 'filter 0.3s ease';
+                    canvas.style.filter = 'brightness(1.5) saturate(2)';
+                    setTimeout(() => {
+                        canvas.style.filter = 'none';
+                        canvas.style.transition = '';
+                    }, 300);
+                }
+                
+                if (!gameRunning) drawGame();
+            });
+        });
+
+        // Gestion de la vitesse
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelector('.difficulty-btn.active').classList.remove('active');
+                btn.classList.add('active');
+                const newSpeed = parseInt(btn.dataset.speed);
+                
+                if (gameRunning) {
+                    const oldSpeed = gameSpeed;
+                    const steps = 10;
+                    const speedDiff = (newSpeed - oldSpeed) / steps;
+                    let currentStep = 0;
+                    
+                    const transitionSpeed = setInterval(() => {
+                        currentStep++;
+                        gameSpeed = Math.round(oldSpeed + (speedDiff * currentStep));
+                        
+                        if (currentStep >= steps) {
+                            gameSpeed = newSpeed;
+                            clearInterval(transitionSpeed);
+                        }
+                        
+                        if (gameInterval) {
+                            clearInterval(gameInterval);
+                            startGame();
+                        }
+                    }, 50);
+                } else {
+                    gameSpeed = newSpeed;
+                }
+            });
+        });
+
+        // Gestion des toggles
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                if (toggle.id === 'fullscreenToggle') return; // Géré séparément
+                
+                toggle.classList.toggle('active');
+                const setting = toggle.id.replace('Toggle', '');
+                
+                if (settings.hasOwnProperty(setting)) {
+                    settings[setting] = toggle.classList.contains('active');
+                    
+                    toggle.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        toggle.style.transform = 'scale(1)';
+                    }, 100);
+                    
+                    if (setting === 'effects' || setting === 'animations') {
+                        if (!gameRunning) drawGame();
+                    }
+                }
+            });
+        });
+
+        // Initialisation finale
+        function finalizeInitialization() {
+            // Masquer l'écran de chargement
+            setTimeout(() => {
+                document.getElementById('appLoading').classList.add('hide');
+                setTimeout(() => {
+                    document.getElementById('appLoading').style.display = 'none';
+                }, 500);
+            }, 1500);
+
+            // Afficher bannière d'installation après un délai
+            setTimeout(() => {
+                if (!isInstalled && installBannerShown && deferredPrompt) {
+                    showInstallBanner();
+                }
+            }, 3000);
+
+            updateDisplay();
+            updateScoresDisplay();
+            initGame();
+        }
+
+        // Démarrer l'application
+        window.addEventListener('load', finalizeInitialization);
+        
+        // Si déjà chargé
+        if (document.readyState === 'complete') {
+            finalizeInitialization();
+        }
+    </script>
+</body>
+</html>
